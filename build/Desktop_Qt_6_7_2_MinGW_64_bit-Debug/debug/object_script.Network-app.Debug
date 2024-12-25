@@ -1,0 +1,15 @@
+debug/ChatPanel.o
+debug/ChessBoard.o
+debug/NetworkServer.o
+debug/PromotionDialog.o
+debug/StatusPanel.o
+debug/main.o
+debug/mainwindow.o
+debug/qrc_resource.o
+debug/qrc_qmake_qmake_qm_files.o
+debug/moc_ChatPanel.o
+debug/moc_ChessBoard.o
+debug/moc_NetworkServer.o
+debug/moc_PromotionDialog.o
+debug/moc_StatusPanel.o
+debug/moc_mainwindow.o

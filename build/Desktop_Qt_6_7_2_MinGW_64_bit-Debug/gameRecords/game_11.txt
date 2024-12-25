@@ -1,0 +1,24 @@
+Game Record
+Time Control: 300s
+Start Time: 2024-12-25 18:59:05
+
+Step 1: Pf4
+bR	bN	bB	bQ	bK	bB	bN	bR	
+bP	bP	bP	bP	bP	bP	bP	bP	
+00	00	00	00	00	00	00	00	
+00	00	00	00	00	00	00	00	
+00	00	00	00	00	wP	00	00	
+00	00	00	00	00	00	00	00	
+wP	wP	wP	wP	wP	00	wP	wP	
+wR	wN	wB	wQ	wK	wB	wN	wR	
+
+Step 2: Pe5
+bR	bN	bB	bQ	bK	bB	bN	bR	
+bP	bP	bP	bP	00	bP	bP	bP	
+00	00	00	00	00	00	00	00	
+00	00	00	00	bP	00	00	00	
+00	00	00	00	00	wP	00	00	
+00	00	00	00	00	00	00	00	
+wP	wP	wP	wP	wP	00	wP	wP	
+wR	wN	wB	wQ	wK	wB	wN	wR	
+
