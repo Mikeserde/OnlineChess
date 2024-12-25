@@ -1,22 +1,27 @@
-#include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QMediaPlayer>
 
-class AudioPlayer : public QObject {
+class AudioPlayer : public QObject
+{
     Q_OBJECT
 
 public:
-    AudioPlayer(QObject *parent = nullptr) : QObject(parent) {
+    AudioPlayer(QObject *parent = nullptr)
+        : QObject(parent)
+    {
         player = new QMediaPlayer(this);
         audioOutput = new QAudioOutput(this);
         player->setAudioOutput(audioOutput);
     }
 
-    ~AudioPlayer() {
+    ~AudioPlayer()
+    {
         delete player;
         delete audioOutput;
     }
 
-    void play(const QString &filePath) {
+    void play(const QString &filePath)
+    {
         // 设置音频输出设备
         audioOutput->setVolume(50); // 设置音量为50%
 
@@ -27,9 +32,7 @@ public:
         player->play();
     }
 
-    void stop() {
-        player->stop();
-    }
+    void stop() { player->stop(); }
 
 private:
     QMediaPlayer *player;

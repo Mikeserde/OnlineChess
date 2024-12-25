@@ -4,26 +4,30 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <QDebug>
 #include <QTimer>
 
-class NetworkServer : public QObject {
+class NetworkServer : public QObject
+{
     Q_OBJECT
 
 public:
-    explicit NetworkServer(QObject *parent = nullptr);
+    explicit NetworkServer(quint16 port, QObject *parent = nullptr);
     ~NetworkServer();
 
     bool isListening() const;
-    bool startServer(quint16 port = 5010);
-    void stopServer();
+    void sendMessageToClients(const QByteArray &message);
     quint16 serverPort() const;
-    void sendMessageToClients(const QByteArray& message);
+    bool startServer(quint16 port); // Added back the startServer method
+
+public slots:
+    void stopServer(); // Changed to public slot for better accessibility
 
 signals:
-    void clientDataReceived(QTcpSocket* clientSocket, const QByteArray& data);
-    void clientConnected(const QString& ipAddress);
+    void clientDataReceived(QTcpSocket *clientSocket, const QByteArray &data);
+    void clientConnected(const QString &ipAddress);
     void connectionStatusChanged(bool connected);
+    void errorOccurred(const QString &error);
+    void serverStopped();
 
 private slots:
     void onNewConnection();
@@ -34,6 +38,7 @@ private slots:
 private:
     QTcpServer *server;
     QTimer *connectionMonitorTimer;
+    QList<QTcpSocket*> clientSockets;
 };
 
 #endif // NETWORKSERVER_H

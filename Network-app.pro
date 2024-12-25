@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     ChatPanel.cpp \
     ChessBoard.cpp \
+    NetworkClient.cpp \
     NetworkServer.cpp \
     PromotionDialog.cpp \
     StatusPanel.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     ChessPiece.h \
     King.h \
     Knight.h \
+    NetworkClient.h \
     NetworkServer.h \
     Pawn.h \
     PromotionDialog.h \

@@ -1,12 +1,15 @@
 #include "statuspanel.h"
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 #include "chessboard.h"
 
-StatusPanel::StatusPanel(QWidget* parent) : QWidget(parent), whiteTime(0), blackTime(0)
+StatusPanel::StatusPanel(QWidget *parent)
+    : QWidget(parent)
+    , whiteTime(0)
+    , blackTime(0)
 {
     initializeUI();
 
@@ -29,9 +32,10 @@ void StatusPanel::initializeUI()
     blackClock->setSegmentStyle(QLCDNumber::Filled);
 
     // Set default styles for clocks
-    whiteClock->setStyleSheet("background-color: green; color: black; font-size: 24px;"); // Default style
-    blackClock->setStyleSheet("background-color: gray; color: white; font-size: 24px;"); // Default style
-
+    whiteClock->setStyleSheet(
+        "background-color: green; color: black; font-size: 24px;"); // Default style
+    blackClock->setStyleSheet(
+        "background-color: gray; color: white; font-size: 24px;"); // Default style
 
     // Create the time selector dropdown
     timeSelector = new QComboBox(this);
@@ -47,22 +51,22 @@ void StatusPanel::initializeUI()
     timeSelector->addItem("24 hours", 86400);
 
     // Initialize clocks to 05:00
-    int initialTime = timeSelector->itemData(0).toInt();  // 获取第一个选项的时间（秒）
+    int initialTime = timeSelector->itemData(0).toInt(); // 获取第一个选项的时间（秒）
 
-    whiteTime = initialTime;  // 重置白棋计时器
-    blackTime = initialTime;  // 重置黑棋计时器
+    whiteTime = initialTime; // 重置白棋计时器
+    blackTime = initialTime; // 重置黑棋计时器
 
     // 更新计时器显示
-    updateClockDisplay();  // 将白棋和黑棋的初始时间更新到 UI
+    updateClockDisplay(); // 将白棋和黑棋的初始时间更新到 UI
 
     // Create the start button
     startButton = new QPushButton("Start Game", this);
-    startButton->setFixedSize(100, 30);  // 设置按钮的固定宽度为100，高度为50
+    startButton->setFixedSize(100, 30); // 设置按钮的固定宽度为100，高度为50
     connect(startButton, &QPushButton::clicked, this, &StatusPanel::startGame);
 
     // 创建重置按钮
     resetButton = new QPushButton("Reset Game", this);
-    resetButton->setFixedSize(100, 30);  // 设置按钮的固定宽度和高度
+    resetButton->setFixedSize(100, 30); // 设置按钮的固定宽度和高度
     connect(resetButton, &QPushButton::clicked, this, &StatusPanel::resetGame);
 
     // Create the move history text edit
@@ -70,25 +74,25 @@ void StatusPanel::initializeUI()
     moveHistory->setReadOnly(true); // Make the move history read-only
 
     // Create layouts for player clocks with labels
-    QHBoxLayout* whiteClockLayout = new QHBoxLayout();
+    QHBoxLayout *whiteClockLayout = new QHBoxLayout();
     whiteClockLayout->addWidget(new QLabel("White Player", this));
     whiteClockLayout->addStretch(); // Stretchable space between label and clock
     whiteClockLayout->addWidget(whiteClock);
 
     // Create layout for the black player's clock
-    QHBoxLayout* blackClockLayout = new QHBoxLayout();
+    QHBoxLayout *blackClockLayout = new QHBoxLayout();
     blackClockLayout->addWidget(new QLabel("Black Player", this));
     blackClockLayout->addStretch(); // Stretchable space between label and clock
     blackClockLayout->addWidget(blackClock);
 
     // Create a horizontal layout for the time selector
-    QHBoxLayout* timeSelectorLayout = new QHBoxLayout();
-    QLabel* timeLabel = new QLabel("Select Time:", this);
+    QHBoxLayout *timeSelectorLayout = new QHBoxLayout();
+    QLabel *timeLabel = new QLabel("Select Time:", this);
     timeSelectorLayout->addWidget(timeLabel);
     timeSelectorLayout->addWidget(timeSelector);
 
     // Create a vertical layout for the overall panel
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // Add the time selector layout at the top
     mainLayout->addLayout(timeSelectorLayout);
@@ -103,11 +107,11 @@ void StatusPanel::initializeUI()
     mainLayout->addLayout(whiteClockLayout);
 
     // 创建布局以将按钮居中
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->addStretch();  // 添加可伸缩空间到左侧
-    buttonLayout->addWidget(startButton);  // 添加开始按钮
-    buttonLayout->addWidget(resetButton);  // 添加重置按钮
-    buttonLayout->addStretch();  // 添加可伸缩空间到右侧
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->addStretch();           // 添加可伸缩空间到左侧
+    buttonLayout->addWidget(startButton); // 添加开始按钮
+    buttonLayout->addWidget(resetButton); // 添加重置按钮
+    buttonLayout->addStretch();           // 添加可伸缩空间到右侧
 
     // Add the button layout to the main vertical layout
     mainLayout->addLayout(buttonLayout);
@@ -118,7 +122,8 @@ void StatusPanel::initializeUI()
 
 void StatusPanel::startGame()
 {
-    if (chessBoard) chessBoard->startGame();
+    if (chessBoard)
+        chessBoard->startGame();
 
     // Get selected time from the time selector
     int selectedTime = timeSelector->currentData().toInt();
@@ -161,66 +166,64 @@ void StatusPanel::updateClockDisplay()
 
 void StatusPanel::updateClocks()
 {
-    if (!chessBoard->getIsGaming()) return;
+    if (!chessBoard->getIsGaming())
+        return;
 
     // Decrease time for the current player
-    if (chessBoard -> getIsCurrentWhite())
-    {
+    if (chessBoard->getIsCurrentWhite()) {
         whiteTime--;
-        if (whiteTime < 0) whiteTime = 0; // Ensure time does not go negative
+        if (whiteTime < 0)
+            whiteTime = 0; // Ensure time does not go negative
 
         // Update the display with the current time values
         updateClockDisplay();
 
         // Change color and background if the remaining time is low (e.g., less than 10 seconds)
         if (whiteTime <= 10) {
-            whiteClock->setStyleSheet("background-color: red; color: white; font-size: 24px;"); // Emphasize with red background and white text
+            whiteClock->setStyleSheet(
+                "background-color: red; color: white; font-size: 24px;"); // Emphasize with red background and white text
+        } else {
+            whiteClock->setStyleSheet(
+                "background-color: green; color: black; font-size: 24px;"); // Emphasize with green background and black text
         }
-        else
-        {
-            whiteClock->setStyleSheet("background-color: green; color: black; font-size: 24px;"); // Emphasize with green background and black text
-        }
-        blackClock->setStyleSheet("background-color: gray; color: white; font-size: 24px;"); // Default style
-    }
-    else
-    {
+        blackClock->setStyleSheet(
+            "background-color: gray; color: white; font-size: 24px;"); // Default style
+    } else {
         blackTime--;
-        if (blackTime < 0) blackTime = 0; // Ensure time does not go negative
+        if (blackTime < 0)
+            blackTime = 0; // Ensure time does not go negative
 
         // Update the display with the current time values
         updateClockDisplay();
 
         // Change color and background if the remaining time is low (e.g., less than 10 seconds)
         if (blackTime <= 10) {
-            blackClock->setStyleSheet("background-color: red; color: white; font-size: 24px;"); // Emphasize with red background and white text
+            blackClock->setStyleSheet(
+                "background-color: red; color: white; font-size: 24px;"); // Emphasize with red background and white text
+        } else {
+            blackClock->setStyleSheet(
+                "background-color: green; color: black; font-size: 24px;"); // Emphasize with green background and black text
         }
-        else
-        {
-            blackClock->setStyleSheet("background-color: green; color: black; font-size: 24px;"); // Emphasize with green background and black text
-        }
-        whiteClock->setStyleSheet("background-color: gray; color: white; font-size: 24px;"); // Default style
+        whiteClock->setStyleSheet(
+            "background-color: gray; color: white; font-size: 24px;"); // Default style
     }
 
     // Switch turns if time runs out and determine the result
-    if (whiteTime == 0 || blackTime == 0)
-    {
-        gameTimer->stop();  // Stop the timer when time runs out
+    if (whiteTime == 0 || blackTime == 0) {
+        gameTimer->stop(); // Stop the timer when time runs out
 
         // Determine the result of the game
         if (whiteTime == 0 && blackTime > 0) {
             // White loses due to timeout
-            showTimeOutMessage(true);  // Pass true since it's white's time that ran out
-        }
-        else if (blackTime == 0 && whiteTime > 0) {
+            showTimeOutMessage(true); // Pass true since it's white's time that ran out
+        } else if (blackTime == 0 && whiteTime > 0) {
             // Black loses due to timeout
-            showTimeOutMessage(false);  // Pass false since it's black's time that ran out
-        }
-        else if (whiteTime == 0 && blackTime == 0) {
+            showTimeOutMessage(false); // Pass false since it's black's time that ran out
+        } else if (whiteTime == 0 && blackTime == 0) {
             // Both players run out of time, it's a draw
             showGameOverMessage("It's a draw!");
         }
     }
-
 }
 
 void StatusPanel::showTimeOutMessage(bool whiteTurn)
@@ -230,12 +233,14 @@ void StatusPanel::showTimeOutMessage(bool whiteTurn)
     msgBox.setWindowTitle("Time's Up!");
 
     // 根据当前轮次设置文本 (例如，白方时间耗尽，黑方获胜)
-    msgBox.setText(whiteTurn ? "White's time is up. Black wins!" : "Black's time is up. White wins!");
+    msgBox.setText(whiteTurn ? "White's time is up. Black wins!"
+                             : "Black's time is up. White wins!");
     msgBox.setWindowIcon(QIcon(":/images/chess_icon.jpg"));
-    msgBox.setIcon(QMessageBox::NoIcon);  // 去除图标
+    msgBox.setIcon(QMessageBox::NoIcon); // 去除图标
 
     // 调整字体大小并设置居中对齐
-    msgBox.setStyleSheet("QLabel { font-size: 14px; font-weight: bold; text-align: left; } QPushButton { font-size: 10px; }");
+    msgBox.setStyleSheet("QLabel { font-size: 14px; font-weight: bold; text-align: left; } "
+                         "QPushButton { font-size: 10px; }");
 
     msgBox.setStandardButtons(QMessageBox::Ok);
 
@@ -246,18 +251,17 @@ void StatusPanel::showTimeOutMessage(bool whiteTurn)
     }
 
     // 添加 spacer 来调整消息框大小
-    QSpacerItem* spacer = new QSpacerItem(200, 150, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    QGridLayout* layout = (QGridLayout*)msgBox.layout();
+    QSpacerItem *spacer = new QSpacerItem(200, 150, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QGridLayout *layout = (QGridLayout *) msgBox.layout();
     layout->addItem(spacer, layout->rowCount(), 0, 1, layout->columnCount());
 
     // 显示消息框
     msgBox.exec();
 
-    chessBoard -> timeRunOut();
+    chessBoard->timeRunOut();
 }
 
-
-void StatusPanel::showGameOverMessage(const QString& message)
+void StatusPanel::showGameOverMessage(const QString &message)
 {
     // Display a message box or update a label to show the game result
     QMessageBox::information(this, "Game Over", message);
@@ -269,24 +273,24 @@ void StatusPanel::resetGame()
     moveHistory->clear();
 
     // Initialize clocks
-    int initialTime = timeSelector->itemData(0).toInt();  // 获取第一个选项的时间（秒）
+    int initialTime = timeSelector->itemData(0).toInt(); // 获取第一个选项的时间（秒）
 
-    whiteTime = initialTime;  // 重置白棋计时器
-    blackTime = initialTime;  // 重置黑棋计时器
+    whiteTime = initialTime; // 重置白棋计时器
+    blackTime = initialTime; // 重置黑棋计时器
 
     // 更新计时器显示
-    updateClockDisplay();  // 将白棋和黑棋的初始时间更新到 UI
+    updateClockDisplay(); // 将白棋和黑棋的初始时间更新到 UI
 
     startButton->setEnabled(true);
     resetButton->setEnabled(false);
     timeSelector->setEnabled(true);
 
-    chessBoard -> resetGame();
+    chessBoard->resetGame();
 }
 
-
-void StatusPanel::addMoveToHistory(const QString& move, int step)
+void StatusPanel::addMoveToHistory(const QString &move, int step)
 {
-    moveHistory->insertPlainText(move);  // 插入文本，不自动换行
-    if (step%2) moveHistory->append(QString());
+    moveHistory->insertPlainText(move); // 插入文本，不自动换行
+    if (step % 2)
+        moveHistory->append(QString());
 }
