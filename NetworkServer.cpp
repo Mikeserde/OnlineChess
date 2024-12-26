@@ -1,42 +1,34 @@
-#include "networkserver.h"
-#include <QHostAddress>
-#include <QTcpSocket>
-#include <QTimer>
+#include "NetworkServer.h"
 #include <QDebug>
+#include <QHostAddress>
+#include <QTimer>
 
-NetworkServer::NetworkServer(quint16 port, QObject *parent)
-    : QObject(parent)
+const char* NetworkServer::SERVER_PREFIX = "(server)";
+
+NetworkServer::NetworkServer(quint16 _port, QObject *parent)
+    : QObject(parent), port(_port), m_lastConnectionState(false)
 {
     server = new QTcpServer(this);
 
-    // Connect the newConnection signal to the onNewConnection slot
-    connect(server, &QTcpServer::newConnection, this, &NetworkServer::onNewConnection);
+    // Connect the newConnection signal to the onConnected slot
+    connect(server, &QTcpServer::newConnection, this, &NetworkServer::onConnected);
 
     // Timer for monitoring connections
     connectionMonitorTimer = new QTimer(this);
-    connect(connectionMonitorTimer, &QTimer::timeout, this, &NetworkServer::checkConnections);
+    connect(connectionMonitorTimer, &QTimer::timeout, this, &NetworkServer::checkConnectionStatus);
 
     // Start the server immediately with the given port
     if (!startServer(port)) {
-        qCritical().noquote() << "(server) Failed to start server on port" << port << "Error:" << server->errorString();
-        emit errorOccurred(server->errorString());
+        emit serverError(server->errorString());
     } else {
-        qDebug().noquote() << "(server) Server started on port" << server->serverPort();
+        qDebug().noquote() << SERVER_PREFIX << "Server started on port" << server->serverPort();
     }
 }
 
 NetworkServer::~NetworkServer()
 {
-    if (server) {
-        server->close();
-        delete server;
-        qDebug().noquote() << "(server) Server closed";
-    }
-    if (connectionMonitorTimer) {
-        connectionMonitorTimer->stop();
-        delete connectionMonitorTimer;
-        qDebug().noquote() << "(server) Connection monitor timer stopped";
-    }
+    stopServer();
+    qDebug().noquote() << SERVER_PREFIX << "Server closed";
 }
 
 bool NetworkServer::isListening() const
@@ -44,22 +36,16 @@ bool NetworkServer::isListening() const
     return server->isListening();
 }
 
-/**
- * @brief Starts the server on the specified port.
- * @param port The port number on which the server should listen.
- * @return True if the server was successfully started, false otherwise.
- */
 bool NetworkServer::startServer(quint16 port)
 {
     if (!server->isListening()) {
         if (server->listen(QHostAddress::Any, port)) {
-            qDebug().noquote() << "(server) Server is listening on port" << server->serverPort();
+            qDebug().noquote() << SERVER_PREFIX << "Server is listening on port" << server->serverPort();
             connectionMonitorTimer->start(5000); // Start checking connections
             emit connectionStatusChanged(true);
             return true;
         } else {
-            qCritical().noquote() << "(server) Server could not start on port" << port << "Error:" << server->errorString();
-            emit errorOccurred(server->errorString());
+            emit serverError(server->errorString());
             return false;
         }
     }
@@ -73,7 +59,7 @@ void NetworkServer::stopServer()
         connectionMonitorTimer->stop();
         emit serverStopped();
         emit connectionStatusChanged(false);
-        qDebug().noquote() << "(server) Server stopped";
+        qDebug().noquote() << SERVER_PREFIX << "Server stopped";
     }
 }
 
@@ -82,18 +68,23 @@ quint16 NetworkServer::serverPort() const
     return server->serverPort();
 }
 
-void NetworkServer::sendMessageToClients(const QByteArray &message)
+void NetworkServer::sendMessageToClient(const QByteArray &message)
 {
     for (QTcpSocket *socket : clientSockets) {
         if (socket->state() == QAbstractSocket::ConnectedState) {
-            socket->write(message);
-            socket->flush(); // Ensure the data is sent immediately
-            qDebug().noquote() << "(server) Sent message to client" << socket->peerAddress().toString() << ":" << message;
+            if (socket->write(message) != -1) {
+                socket->flush(); // Ensure the data is sent immediately
+                qDebug().noquote() << SERVER_PREFIX << "Sent message to client"
+                                   << socket->peerAddress().toString() << ":" << message;
+            } else {
+                qDebug().noquote() << SERVER_PREFIX << "Failed to send message to client"
+                                   << socket->peerAddress().toString();
+            }
         }
     }
 }
 
-void NetworkServer::onNewConnection()
+void NetworkServer::onConnected()
 {
     // Get the new connection socket
     QTcpSocket *clientSocket = server->nextPendingConnection();
@@ -102,22 +93,22 @@ void NetworkServer::onNewConnection()
     // Connect socket signals to slots
     connect(clientSocket, &QTcpSocket::readyRead, this, &NetworkServer::onReadyRead);
     connect(clientSocket, &QTcpSocket::disconnected, this, &NetworkServer::onDisconnected);
+    connect(clientSocket, &QTcpSocket::errorOccurred, this, &NetworkServer::onError);
 
     // Record and emit the IP address of the connected client
     QString ipAddress = clientSocket->peerAddress().toString();
-    qDebug().noquote() << "(server) New connection from:" << ipAddress;
-    emit clientConnected(ipAddress);
+    qDebug().noquote() << SERVER_PREFIX << "New connection from:" << ipAddress;
+    emit clientConnected(ipAddress, port);
 }
 
 void NetworkServer::onReadyRead()
 {
-    // Get the socket that emitted the signal
     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
     if (clientSocket) {
         QByteArray data = clientSocket->readAll();
         QString ipAddress = clientSocket->peerAddress().toString();
-        qDebug().noquote() << "(server) Data received from client" << ipAddress << ":" << data;
-        emit clientDataReceived(clientSocket, data); // Emit the signal
+        qDebug().noquote() << SERVER_PREFIX << "Data received from client" << ipAddress << ":" << data;
+        emit clientDataReceived(data); // Emit the signal
     }
 }
 
@@ -126,17 +117,27 @@ void NetworkServer::onDisconnected()
     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
     if (clientSocket) {
         QString ipAddress = clientSocket->peerAddress().toString();
-        qDebug().noquote() << "(server) Client disconnected:" << ipAddress;
+        qDebug().noquote() << SERVER_PREFIX << "Client disconnected:" << ipAddress;
         clientSockets.removeOne(clientSocket); // Remove from list
-        clientSocket->deleteLater(); // Clean up the socket
+        clientSocket->deleteLater();           // Clean up the socket
     }
 }
 
-void NetworkServer::checkConnections()
+void NetworkServer::onError()
 {
-    if (server->isListening()) { // Only check if server is listening
+    QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
+    qDebug().noquote() << SERVER_PREFIX << "Error occurred:" << clientSocket->errorString();
+}
+
+void NetworkServer::checkConnectionStatus()
+{
+    if (server->isListening()) {
         bool anyConnected = !clientSockets.isEmpty();
-        qDebug().noquote() << "(server) Connection status:" << (anyConnected ? "Connected" : "No connections");
-        emit connectionStatusChanged(anyConnected);
+        if (m_lastConnectionState != anyConnected) {
+            m_lastConnectionState = anyConnected;
+            emit connectionStatusChanged(anyConnected);
+            qDebug().noquote() << SERVER_PREFIX << "Connection status:"
+                               << (anyConnected ? "Connected" : "No connections");
+        }
     }
 }

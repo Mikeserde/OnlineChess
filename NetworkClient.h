@@ -14,30 +14,29 @@ public:
     explicit NetworkClient(const QString &host, quint16 port, QObject *parent = nullptr);
     ~NetworkClient();
 
-    void connectToServer(const QString &host, quint16 port);
-    void disconnectFromServer();
-    void sendMessage(const QString &message);
+    void sendMessageToServer(const QByteArray &message);
 
 signals:
-    void connected();
-    void disconnected();
-    void errorOccurred(const QString &error);
-    void dataReceived(const QString &message);
     void connectionStatusChanged(bool connected);
+    void serverDataReceived(const QByteArray &data);
+    void serverConnected(const QString &host, quint16 port);
 
 private slots:
     void onConnected();
     void onReadyRead();
     void onDisconnected();
-    void onError(QAbstractSocket::SocketError socketError);
-    void slot_dataReceived(const QString &message);
+    void onError();
     void checkConnectionStatus();
 
 private:
     QTcpSocket *socket;
     QTimer *connectionMonitorTimer;
-    QString host; // Store host for potential reconnection
-    quint16 port; // Store port for potential reconnection
+    QString host;
+    quint16 port;
+    bool m_lastConnectionState;
+
+    static const char* CLIENT_PREFIX;
 };
 
 #endif // NETWORKCLIENT_H
+

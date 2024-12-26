@@ -2,8 +2,10 @@
 #include <QDebug>
 #include <QTimer>
 
+const char* NetworkClient::CLIENT_PREFIX = "(client)";
+
 NetworkClient::NetworkClient(const QString &host, quint16 port, QObject *parent)
-    : QObject(parent)
+    : QObject(parent), host(host), port(port), m_lastConnectionState(false)
 {
     socket = new QTcpSocket(this);
 
@@ -16,12 +18,12 @@ NetworkClient::NetworkClient(const QString &host, quint16 port, QObject *parent)
     // Timer for monitoring connection status
     connectionMonitorTimer = new QTimer(this);
     connect(connectionMonitorTimer, &QTimer::timeout, this, &NetworkClient::checkConnectionStatus);
+    connectionMonitorTimer->start(5000); // Start timer with 5 seconds interval
 
-    // Connect to the server immediately with the provided host and port
-    connectToServer(host, port);
-    connect(this, &NetworkClient::dataReceived, this, &NetworkClient::slot_dataReceived);
+    // Attempt to connect to the server immediately with the provided host and port
+    socket->connectToHost(host, port);
 
-    qDebug().noquote() << "(client) Creating client connection to" << host << "on port" << port;
+    qDebug().noquote() << CLIENT_PREFIX << "Creating client connection to" << host << "on port" << port;
 }
 
 NetworkClient::~NetworkClient()
@@ -34,75 +36,54 @@ NetworkClient::~NetworkClient()
         connectionMonitorTimer->stop();
         delete connectionMonitorTimer;
     }
-    qDebug().noquote() << "(client) Client connection destroyed";
-}
-
-void NetworkClient::connectToServer(const QString &host, quint16 port)
-{
-    qDebug().noquote() << "(client) Attempting to connect to" << host << "on port" << port;
-    socket->connectToHost(host, port);
-}
-
-void NetworkClient::disconnectFromServer()
-{
-    qDebug().noquote() << "(client) Disconnecting from server";
-    socket->disconnectFromHost();
-}
-
-void NetworkClient::sendMessage(const QString &message)
-{
-    if (socket->state() == QAbstractSocket::ConnectedState) {
-        qDebug().noquote() << "(client) Sending message:" << message;
-        socket->write(message.toUtf8());
-        socket->flush(); // Ensure the data is sent immediately
-    } else {
-        qDebug().noquote() << "(client) Attempted to send message, but not connected";
-    }
+    qDebug().noquote() << CLIENT_PREFIX << "Client connection destroyed";
 }
 
 void NetworkClient::onConnected()
 {
-    qDebug().noquote() << "(client) Connected to server";
-    emit connected();
-    connectionMonitorTimer->start(5000); // Start monitoring the connection
+    emit serverConnected(host, port);
+    qDebug().noquote() << CLIENT_PREFIX << "Connected to" << host << "on port" << port;
 }
 
 void NetworkClient::onReadyRead()
 {
     if (socket) {
         QByteArray data = socket->readAll();
-        QString message = QString::fromUtf8(data); // Assuming messages are UTF-8 encoded
-        emit dataReceived(message);
+        emit serverDataReceived(data);
     }
 }
 
 void NetworkClient::onDisconnected()
 {
-    qDebug().noquote() << "(client) Disconnected from server";
-    emit disconnected();
-    connectionMonitorTimer->stop();
+    qDebug().noquote() << CLIENT_PREFIX << "Disconnected from server";
+    emit connectionStatusChanged(false);
 }
 
-void NetworkClient::onError(QAbstractSocket::SocketError socketError)
+void NetworkClient::onError()
 {
-    QString errorString = socket->errorString();
-    qDebug().noquote() << "(client) Socket error (" << socketError << "):" << errorString;
-    emit errorOccurred(errorString);
+    qDebug().noquote() << CLIENT_PREFIX << "Error occurred:" << socket->errorString();
 }
 
-void NetworkClient::slot_dataReceived(const QString &message)
+void NetworkClient::sendMessageToServer(const QByteArray &message)
 {
-    qDebug().noquote() << "(client) Message received from server:" << message;
+    if (socket->state() == QAbstractSocket::ConnectedState) {
+        qDebug().noquote() << CLIENT_PREFIX << "Sending message:" << message;
+        if (socket->write(message) != -1) {
+            socket->flush(); // Ensure the data is sent immediately
+        } else {
+            qDebug().noquote() << CLIENT_PREFIX << "Failed to send message.";
+        }
+    } else {
+        qDebug().noquote() << CLIENT_PREFIX << "Attempted to send message, but not connected";
+    }
 }
 
 void NetworkClient::checkConnectionStatus()
 {
-    if (socket->state() == QAbstractSocket::ConnectedState) {
-        qDebug().noquote() << "(client) Connection status: Connected";
-    } else {
-        qDebug().noquote() << "(client) Connection status: Disconnected";
-        // Optionally, you could try to reconnect here if desired
-        // connectToServer(host, port); // This would require storing host and port as class members
+    bool isConnected = socket->state() == QAbstractSocket::ConnectedState;
+    if (m_lastConnectionState != isConnected) {
+        m_lastConnectionState = isConnected;
+        emit connectionStatusChanged(isConnected);
+        qDebug().noquote() << CLIENT_PREFIX << "Connection status:" << (isConnected ? "Connected" : "Disconnected");
     }
-    emit connectionStatusChanged(socket->state() == QAbstractSocket::ConnectedState);
 }

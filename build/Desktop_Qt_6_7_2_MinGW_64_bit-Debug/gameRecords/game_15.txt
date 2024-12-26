@@ -1,4 +1,0 @@
-Game Record
-Time Control: 300s
-Start Time: 2024-12-25 19:00:39
-
