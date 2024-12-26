@@ -628,8 +628,8 @@ bool ChessBoard::isMoveValid(int startRow, int startCol, int endRow, int endCol)
 
 void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
 {
-    if (!isGaming)
-        return;
+    if (!isGaming) return;
+    // if (currentMoveColor != playColor) return;
 
     ChessPiece *piece = pieces[startRow][startCol];
     if (!piece || piece->isWhitePiece() != currentMoveColor)
@@ -696,7 +696,7 @@ void ChessBoard::animatePieceMove(
 void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
     // 向对方发送移动信息
-    emit moveMessageSent(startRow, startCol, endRow, endCol);
+    emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
 
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
@@ -907,4 +907,13 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
 
     // Append to game record file
     appendToGameRecordFile(contentToAppend);
+}
+
+void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType)
+{
+    // if (pieceType == "Q") setPiece(new Queen(currentMoveColor), startRow, startCol);
+    // else if (pieceType == "R") setPiece(new Rook(currentMoveColor), startRow, startCol);
+    // else if (pieceType == "N") setPiece(new Knight(currentMoveColor), startRow, startCol);
+    // else if (pieceType == "B") setPiece(new Bishop(currentMoveColor), startRow, startCol);
+    // movePiece(startRow, startCol, endRow, endCol);
 }

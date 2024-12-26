@@ -34,7 +34,7 @@ private:
     QLabel *statusLabel;      // Label to display game status information
     QComboBox *timeSelector;  // Dropdown for selecting time (5, 10, 15, 60 minutes)
     QTextEdit *moveHistory;   // TextEdit to display move history
-    QPushButton *startButton; // Button to start the clock
+    QPushButton *readyButton; // Button to ready the clock
 
     int whiteTime;          // White player's remaining time (in seconds)
     int blackTime;          // Black player's remaining time (in seconds)

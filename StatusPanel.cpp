@@ -60,9 +60,9 @@ void StatusPanel::initializeUI()
     updateClockDisplay(); // 将白棋和黑棋的初始时间更新到 UI
 
     // Create the start button
-    startButton = new QPushButton("Start Game", this);
-    startButton->setFixedSize(100, 30); // 设置按钮的固定宽度为100，高度为50
-    connect(startButton, &QPushButton::clicked, this, &StatusPanel::startGame);
+    readyButton = new QPushButton("Ready", this);
+    readyButton->setFixedSize(100, 30); // 设置按钮的固定宽度为100，高度为50
+    connect(readyButton, &QPushButton::clicked, this, &StatusPanel::startGame);
 
     // Create the move history text edit
     moveHistory = new QTextEdit(this);
@@ -107,7 +107,7 @@ void StatusPanel::initializeUI()
     // 创建布局以将按钮居中
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();           // 添加可伸缩空间到左侧
-    buttonLayout->addWidget(startButton); // 添加开始按钮
+    buttonLayout->addWidget(readyButton); // 添加开始按钮
     buttonLayout->addStretch();           // 添加可伸缩空间到右侧
 
     // Add the button layout to the main vertical layout
@@ -133,7 +133,7 @@ void StatusPanel::startGame()
     gameTimer->start(1000);
 
     // Disable the start button and time selector
-    startButton->setEnabled(false);
+    readyButton->setEnabled(false);
     timeSelector->setEnabled(false);
 }
 

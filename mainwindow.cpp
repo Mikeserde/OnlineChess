@@ -73,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &NetworkServer::clientDataReceived, this, &MainWindow::onDataReceived);
     connect(server, &NetworkServer::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, server, &NetworkServer::sendMoveMessageToClient);
+    connect(server, &NetworkServer::clientMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
+
 
     chessBoard->initial(playerColor);
 
@@ -84,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, &NetworkClient::serverDataReceived, this, &MainWindow::onDataReceived);
     connect(client, &NetworkClient::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, client, &NetworkClient::sendMoveMessageToServer);
+    connect(client, &NetworkClient::serverMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
 
     connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }

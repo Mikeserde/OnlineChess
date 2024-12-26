@@ -33,6 +33,8 @@ public:
     void timeRunOut() { isGaming = false; }
     bool isSquareAttacked(QPoint square, bool iswhite);
 
+    void moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType);
+
 private:
     bool playColor;
     StatusPanel *statusPanel;
@@ -100,7 +102,7 @@ private:
     void appendToGameRecordFile(const QString &content);
 
 signals:
-    void moveMessageSent(int startRow, int startCol, int endRow, int endCol);
+    void moveMessageSent(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 };
 
 #endif // CHESSBOARD_H

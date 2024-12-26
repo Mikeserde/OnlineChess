@@ -119,7 +119,14 @@ void NetworkServer::onReadyRead()
         if (data.startsWith("[MOVE]")) {
             // Handle move data
             data = data.mid(6); // Remove the prefix
-            emit clientMoveReceived(data);
+            // Assuming 'data' is in the format: "startRow,startCol,endRow,endCol,pieceType"
+            QStringList parts = QString(data).split(',');
+            int startRow = parts[0].toInt();
+            int startCol = parts[1].toInt();
+            int endRow = parts[2].toInt();
+            int endCol = parts[3].toInt();
+            QString pieceType = parts[4];
+            emit clientMoveReceived(startRow, startCol, endRow, endCol, pieceType);
             qDebug().noquote() << SERVER_PREFIX << "Move data received from client" << ipAddress << ":" << data;
         } else if (data.startsWith("[MSG]")) {
             // Handle regular message
@@ -164,9 +171,9 @@ void NetworkServer::checkConnectionStatus()
 }
 
 
-void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol)
+void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
     // Format: [MOVE]startRow,startCol,endRow,endCol
-    QString moveMessage = QString("%1,%2,%3,%4").arg(startRow).arg(startCol).arg(endRow).arg(endCol);
+    QString moveMessage = QString("%1,%2,%3,%4,%5").arg(startRow).arg(startCol).arg(endRow).arg(endCol).arg(pieceType);
     sendMessageToClient(moveMessage.toUtf8(), true);
 }
