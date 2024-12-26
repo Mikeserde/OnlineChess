@@ -22,6 +22,8 @@ signals:
     void serverConnected(const QString &host, quint16 port);
     void serverMoveReceived(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
+    void setClientClock(int clockTime);
+
 private slots:
     void onConnected();
     void onReadyRead();

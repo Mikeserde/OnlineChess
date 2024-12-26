@@ -68,13 +68,19 @@ quint16 NetworkServer::serverPort() const
     return server->serverPort();
 }
 
-void NetworkServer::sendMessageToClient(const QByteArray &message, bool moveInfo)
+void NetworkServer::sendMessageToClient(const QByteArray &message, bool moveInfo, bool clockTime)
 {
     QByteArray messageWithPrefix;
 
     if (moveInfo) {
         messageWithPrefix = "[MOVE]" + message;
-    } else {
+    }
+    else if (clockTime)
+    {
+        messageWithPrefix = "[CLOCK]" + message;
+    }
+    else
+    {
         messageWithPrefix = "[MSG]" + message;
     }
 
@@ -133,7 +139,8 @@ void NetworkServer::onReadyRead()
             data = data.mid(5); // Remove the prefix
             emit clientDataReceived(data);
             qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
-        } else {
+        }
+        else {
             qDebug().noquote() << SERVER_PREFIX << "Received invalid message from client" << ipAddress << ":" << data;
         }
     }
@@ -175,5 +182,12 @@ void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endR
 {
     // Format: [MOVE]startRow,startCol,endRow,endCol
     QString moveMessage = QString("%1,%2,%3,%4,%5").arg(startRow).arg(startCol).arg(endRow).arg(endCol).arg(pieceType);
-    sendMessageToClient(moveMessage.toUtf8(), true);
+    sendMessageToClient(moveMessage.toUtf8(), 1);
+}
+
+
+void NetworkServer::setClientClock(int clockTime)
+{
+    const QByteArray message = QString("%1").arg(clockTime).toUtf8();
+    sendMessageToClient(message, 0, 1);
 }

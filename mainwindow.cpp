@@ -65,6 +65,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowIcon(QIcon(":/images/chess_icon.jpg"));
 
+
+    chessBoard->initial(playerColor);
+
     // Create the NetworkServer
     server = new NetworkServer(5010, this);
 
@@ -74,9 +77,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &NetworkServer::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, server, &NetworkServer::sendMoveMessageToClient);
     connect(server, &NetworkServer::clientMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
+    connect(statusPanel, &StatusPanel::setClientClcok, server, &NetworkServer::setClientClock);
 
-
-    chessBoard->initial(playerColor);
 
     // Create the NetworkClient
     const QString &host = "127.0.0.1";
@@ -87,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, &NetworkClient::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, client, &NetworkClient::sendMoveMessageToServer);
     connect(client, &NetworkClient::serverMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
+    connect(client, &NetworkClient::setClientClock, statusPanel, &StatusPanel::initialClock);
 
     connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }

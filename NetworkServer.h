@@ -18,7 +18,8 @@ public:
     void stopServer();
     bool isListening() const;
     quint16 serverPort() const;
-    void sendMessageToClient(const QByteArray &message, bool moveInfo = false);
+    void sendMessageToClient(const QByteArray &message, bool moveInfo = false, bool clockTime = false);
+    void setClientClock(int clockTime);
     bool startServer(quint16 port);
 
 signals:

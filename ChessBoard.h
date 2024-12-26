@@ -78,7 +78,7 @@ private:
     void clearHighlightedSquares();
     void resetSquareColor(int row, int col);
 
-    void setPiece(ChessPiece *piece, int row, int col);
+    void setPiece(ChessPiece *piece, int row, int col, bool en = 0);
 
     bool isDraw();
     bool isFiftyMoveRule();

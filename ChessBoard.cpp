@@ -171,9 +171,9 @@ void ChessBoard::initializePieces()
     setPiece(new King(playColor, this), 7, 4);
 }
 
-void ChessBoard::setPiece(ChessPiece *piece, int row, int col)
+void ChessBoard::setPiece(ChessPiece *piece, int row, int col, bool en)
 {
-    if (pieces[row][col] != nullptr) {
+    if (pieces[row][col] != nullptr && en == 0) {
         // 更新上一次吃子距离数
         if (pieces[row][col]->isWhitePiece() != piece->isWhitePiece())
             eatOnePieceDistance = 0;
@@ -210,7 +210,7 @@ void ChessBoard::onSquareClicked(int row, int col)
                                                                            lastMoveEnd);
                 for (const QPoint &move : moves) {
                     squares[move.x()][move.y()]->setStyleSheet(pieces[row][col]->isWhitePiece()
-                                                                       == currentMoveColor
+                                                               == currentMoveColor
                                                                    ? possibleMoveSquareColorOn
                                                                    : possibleMoveSquareColorNotOn);
                     highlightedSquares.append(move);
@@ -233,7 +233,7 @@ void ChessBoard::onSquareClicked(int row, int col)
 
         for (const QPoint &move : moves) {
             squares[move.x()][move.y()]->setStyleSheet(pieces[row][col]->isWhitePiece()
-                                                               == currentMoveColor
+                                                       == currentMoveColor
                                                            ? possibleMoveSquareColorOn
                                                            : possibleMoveSquareColorNotOn);
             highlightedSquares.append(move);
@@ -871,10 +871,10 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
     curMove = QString("%1%2%3").arg(pieceName).arg(QChar('a' + endPos.y())).arg(8 - endPos.x());
     if (step % 2 == 0) {
         moveStr = QString("%1.  %2%3%4")
-                      .arg(step / 2)
-                      .arg(pieceName)
-                      .arg(QChar('a' + endPos.y()))
-                      .arg(8 - endPos.x());
+        .arg(step / 2)
+            .arg(pieceName)
+            .arg(QChar('a' + endPos.y()))
+            .arg(8 - endPos.x());
 
         if (castleIndex == 1) {
             moveStr = QString("%1.  O-O").arg(step / 2);
@@ -911,9 +911,9 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
 
 void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
-    // if (pieceType == "Q") setPiece(new Queen(currentMoveColor), startRow, startCol);
-    // else if (pieceType == "R") setPiece(new Rook(currentMoveColor), startRow, startCol);
-    // else if (pieceType == "N") setPiece(new Knight(currentMoveColor), startRow, startCol);
-    // else if (pieceType == "B") setPiece(new Bishop(currentMoveColor), startRow, startCol);
+    // if (pieceType == "Q") setPiece(new Queen(currentMoveColor), startRow, startCol, 1);
+    // else if (pieceType == "R") setPiece(new Rook(currentMoveColor), startRow, startCol, 1);
+    // else if (pieceType == "N") setPiece(new Knight(currentMoveColor), startRow, startCol, 1);
+    // else if (pieceType == "B") setPiece(new Bishop(currentMoveColor), startRow, startCol, 1);
     // movePiece(startRow, startCol, endRow, endCol);
 }

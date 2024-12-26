@@ -65,7 +65,11 @@ void NetworkClient::onReadyRead()
             data = data.mid(5); // Remove the prefix
             emit serverDataReceived(data);
             qDebug().noquote() << CLIENT_PREFIX << "Chat message received from server:" << data;
-        } else {
+        } else if (data.startsWith("[CLOCK]")) {
+            data = data.mid(7);
+            emit setClientClock(data.toInt());
+        }
+        else {
             qDebug().noquote() << CLIENT_PREFIX << "Received invalid message from server:" << data;
         }
     }
