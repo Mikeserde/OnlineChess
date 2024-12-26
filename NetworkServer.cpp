@@ -68,14 +68,22 @@ quint16 NetworkServer::serverPort() const
     return server->serverPort();
 }
 
-void NetworkServer::sendMessageToClient(const QByteArray &message)
+void NetworkServer::sendMessageToClient(const QByteArray &message, bool moveInfo)
 {
+    QByteArray messageWithPrefix;
+
+    if (moveInfo) {
+        messageWithPrefix = "[MOVE]" + message;
+    } else {
+        messageWithPrefix = "[MSG]" + message;
+    }
+
     for (QTcpSocket *socket : clientSockets) {
         if (socket->state() == QAbstractSocket::ConnectedState) {
-            if (socket->write(message) != -1) {
+            if (socket->write(messageWithPrefix) != -1) {
                 socket->flush(); // Ensure the data is sent immediately
                 qDebug().noquote() << SERVER_PREFIX << "Sent message to client"
-                                   << socket->peerAddress().toString() << ":" << message;
+                                   << socket->peerAddress().toString() << ":" << messageWithPrefix;
             } else {
                 qDebug().noquote() << SERVER_PREFIX << "Failed to send message to client"
                                    << socket->peerAddress().toString();
@@ -107,10 +115,23 @@ void NetworkServer::onReadyRead()
     if (clientSocket) {
         QByteArray data = clientSocket->readAll();
         QString ipAddress = clientSocket->peerAddress().toString();
-        qDebug().noquote() << SERVER_PREFIX << "Data received from client" << ipAddress << ":" << data;
-        emit clientDataReceived(data); // Emit the signal
+
+        if (data.startsWith("[MOVE]")) {
+            // Handle move data
+            data = data.mid(5); // Remove the prefix
+            emit clientMoveReceived(data);
+            qDebug().noquote() << SERVER_PREFIX << "Move data received from client" << ipAddress << ":" << data;
+        } else if (data.startsWith("[MSG]")) {
+            // Handle regular message
+            data = data.mid(4); // Remove the prefix
+            emit clientDataReceived(data);
+            qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
+        } else {
+            qDebug().noquote() << SERVER_PREFIX << "Received invalid message from client" << ipAddress << ":" << data;
+        }
     }
 }
+
 
 void NetworkServer::onDisconnected()
 {
@@ -140,4 +161,10 @@ void NetworkServer::checkConnectionStatus()
                                << (anyConnected ? "Connected" : "No connections");
         }
     }
+}
+
+
+void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol)
+{
+
 }

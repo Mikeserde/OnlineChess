@@ -14,11 +14,12 @@ public:
     explicit NetworkClient(const QString &host, quint16 port, QObject *parent = nullptr);
     ~NetworkClient();
 
-    void sendMessageToServer(const QByteArray &message);
+    void sendMessageToServer(const QByteArray &message, bool moveInfo = false);
 
 signals:
     void connectionStatusChanged(bool connected);
     void serverDataReceived(const QByteArray &data);
+    void serverMoveReceived(const QByteArray &data);
     void serverConnected(const QString &host, quint16 port);
 
 private slots:
@@ -27,6 +28,9 @@ private slots:
     void onDisconnected();
     void onError();
     void checkConnectionStatus();
+
+public slots:
+    void sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol);
 
 private:
     QTcpSocket *socket;

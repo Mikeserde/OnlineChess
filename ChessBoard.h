@@ -97,6 +97,9 @@ private:
     QString getBoardState() const;
     void recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move);
     void appendToGameRecordFile(const QString &content);
+
+signals:
+    void moveMessageSent(int startRow, int startCol, int endRow, int endCol);
 };
 
 #endif // CHESSBOARD_H

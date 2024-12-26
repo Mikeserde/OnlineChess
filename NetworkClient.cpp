@@ -49,9 +49,22 @@ void NetworkClient::onReadyRead()
 {
     if (socket) {
         QByteArray data = socket->readAll();
-        emit serverDataReceived(data);
+        if (data.startsWith("[MOVE]")) {
+            // Handle move data
+            data = data.mid(5); // Remove the prefix
+            emit serverMoveReceived(data);
+            qDebug().noquote() << CLIENT_PREFIX << "Move data received from server:" << data;
+        } else if (data.startsWith("[MSG]")) {
+            // Handle regular message
+            data = data.mid(4); // Remove the prefix
+            emit serverDataReceived(data);
+            qDebug().noquote() << CLIENT_PREFIX << "Chat message received from server:" << data;
+        } else {
+            qDebug().noquote() << CLIENT_PREFIX << "Received invalid message from server:" << data;
+        }
     }
 }
+
 
 void NetworkClient::onDisconnected()
 {
@@ -64,11 +77,19 @@ void NetworkClient::onError()
     qDebug().noquote() << CLIENT_PREFIX << "Error occurred:" << socket->errorString();
 }
 
-void NetworkClient::sendMessageToServer(const QByteArray &message)
+void NetworkClient::sendMessageToServer(const QByteArray &message, bool moveInfo)
 {
+    QByteArray messageWithPrefix;
+
+    if (moveInfo) {
+        messageWithPrefix = "[MOVE]" + message;
+    } else {
+        messageWithPrefix = "[MSG]" + message;
+    }
+
     if (socket->state() == QAbstractSocket::ConnectedState) {
-        qDebug().noquote() << CLIENT_PREFIX << "Sending message:" << message;
-        if (socket->write(message) != -1) {
+        qDebug().noquote() << CLIENT_PREFIX << "Sending message:" << messageWithPrefix;
+        if (socket->write(messageWithPrefix) != -1) {
             socket->flush(); // Ensure the data is sent immediately
         } else {
             qDebug().noquote() << CLIENT_PREFIX << "Failed to send message.";
@@ -86,4 +107,10 @@ void NetworkClient::checkConnectionStatus()
         emit connectionStatusChanged(isConnected);
         qDebug().noquote() << CLIENT_PREFIX << "Connection status:" << (isConnected ? "Connected" : "Disconnected");
     }
+}
+
+
+void NetworkClient::sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol)
+{
+
 }

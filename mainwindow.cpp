@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &NetworkServer::clientConnected, this, &MainWindow::onConnected);
     connect(server, &NetworkServer::clientDataReceived, this, &MainWindow::onDataReceived);
     connect(server, &NetworkServer::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
+    connect(chessBoard, &ChessBoard::moveMessageSent, server, &NetworkServer::sendMoveMessageToClient);
 
     // Create the NetworkClient
     const QString &host = "127.0.0.1";
@@ -78,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, &NetworkClient::serverConnected, this, &MainWindow::onConnected);
     connect(client, &NetworkClient::serverDataReceived, this, &MainWindow::onDataReceived);
     connect(client, &NetworkClient::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
+    connect(chessBoard, &ChessBoard::moveMessageSent, client, &NetworkClient::sendMoveMessageToServer);
 
     connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }

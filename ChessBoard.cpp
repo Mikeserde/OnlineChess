@@ -689,6 +689,9 @@ void ChessBoard::animatePieceMove(
 
 void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *&piece)
 {
+    // 向对方发送移动信息
+    emit moveMessageSent(startRow, startCol, endRow, endCol);
+
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
     lastMoveEnd = QPoint(endRow, endCol);
