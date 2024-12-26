@@ -1,9 +1,8 @@
 #include "chatpanel.h"
-#include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 
-ChatPanel::ChatPanel(QWidget *parent)
-    : QWidget(parent)
+ChatPanel::ChatPanel(QWidget* parent) : QWidget(parent)
 {
     initializeUI();
     connectSignalsAndSlots();
@@ -11,12 +10,12 @@ ChatPanel::ChatPanel(QWidget *parent)
 
 void ChatPanel::initializeUI()
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
     chatHistory = new QTextEdit(this);
     chatHistory->setReadOnly(true);
 
-    QHBoxLayout *inputLayout = new QHBoxLayout;
+    QHBoxLayout* inputLayout = new QHBoxLayout;
     messageInput = new QLineEdit(this);
     sendButton = new QPushButton("Send", this);
     inputLayout->addWidget(messageInput);
@@ -31,7 +30,7 @@ void ChatPanel::connectSignalsAndSlots()
     connect(sendButton, &QPushButton::clicked, this, &ChatPanel::onSendMessageClicked);
 }
 
-void ChatPanel::sendMessage(const QString &message)
+void ChatPanel::sendMessage(const QString& message)
 {
     if (!message.isEmpty()) {
         emit messageSent(message);
@@ -40,7 +39,7 @@ void ChatPanel::sendMessage(const QString &message)
     }
 }
 
-void ChatPanel::receiveMessage(const QString &message)
+void ChatPanel::receiveMessage(const QString& message)
 {
     chatHistory->append(message);
 }
