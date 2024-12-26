@@ -41,7 +41,7 @@ void ChatPanel::sendMessage(const QString& message)
 
 void ChatPanel::receiveMessage(const QString& message)
 {
-    chatHistory->append(message);
+    chatHistory->append("Opponent: "+message);
 }
 
 void ChatPanel::clearChatHistory()

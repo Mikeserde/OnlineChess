@@ -21,11 +21,14 @@ public:
     ~MainWindow();
 
 private slots:
+    //server
     void onClientConnected(const QString& ipAddress);
     void onClientDataReceived(QTcpSocket* clientSocket, const QByteArray& data);
     void onConnectionStatusChanged(bool connected);
     void onSendMessageClicked(const QString& message);
-
+    //client
+    void onServerConnected(const QString& ipAddress);
+    void onServerDataReceived(QTcpSocket* serverSocket, const QByteArray& data);
 private:
     void sendMessage(const QByteArray& message);
 

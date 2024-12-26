@@ -19,10 +19,10 @@ public:
     void sendMessage(const QString &message);
 
 signals:
-    void connected();
+    void connected(const QString& ipAddress);
     void disconnected();
     void errorOccurred(const QString &error);
-    void dataReceived(const QString &message);
+    void dataReceived(QTcpSocket* serverSocket, const QByteArray& data);
     void connectionStatusChanged(bool connected);
 
 private slots:
@@ -30,7 +30,7 @@ private slots:
     void onReadyRead();
     void onDisconnected();
     void onError(QAbstractSocket::SocketError socketError);
-    void slot_dataReceived(const QString &message);
+    void slot_dataReceived(QTcpSocket* serverSocket, const QByteArray& data);
     void checkConnectionStatus();
 
 private:

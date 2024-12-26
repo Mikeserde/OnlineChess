@@ -63,7 +63,8 @@ void NetworkClient::sendMessage(const QString &message)
 void NetworkClient::onConnected()
 {
     qDebug().noquote() << "(client) Connected to server";
-    emit connected();
+    const QString& ipAddress = socket->peerAddress().toString();
+    emit connected(ipAddress);
     connectionMonitorTimer->start(5000); // Start monitoring the connection
 }
 
@@ -71,8 +72,7 @@ void NetworkClient::onReadyRead()
 {
     if (socket) {
         QByteArray data = socket->readAll();
-        QString message = QString::fromUtf8(data); // Assuming messages are UTF-8 encoded
-        emit dataReceived(message);
+        emit dataReceived(socket,data);
     }
 }
 
@@ -90,8 +90,9 @@ void NetworkClient::onError(QAbstractSocket::SocketError socketError)
     emit errorOccurred(errorString);
 }
 
-void NetworkClient::slot_dataReceived(const QString &message)
+void NetworkClient::slot_dataReceived(QTcpSocket* serverSocket, const QByteArray& data)
 {
+    QString message = QString::fromUtf8(data.constData(), data.size());
     qDebug().noquote() << "(client) Message received from server:" << message;
 }
 

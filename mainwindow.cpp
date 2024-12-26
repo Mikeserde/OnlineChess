@@ -9,7 +9,8 @@
 #include "statuspanel.h"
 #include "mainwindow.h"
 #include "chessboard.h"
-#include "networkserver.h"
+#include "NetworkServer.h"
+#include "NetworkClient.h"
 #include "chatpanel.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
@@ -73,6 +74,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
     const QString &host = "127.0.0.1";
     client = new NetworkClient(host, 5010, this);
+
+    // Connect client signals to appropriate slots
+    connect(client, &NetworkClient::connected, this, &MainWindow::onServerConnected);
+    connect(client, &NetworkClient::dataReceived, this, &MainWindow::onServerDataReceived);
 }
 
 MainWindow::~MainWindow()
@@ -84,13 +89,20 @@ void MainWindow::onClientConnected(const QString& ipAddress)
 {
     qDebug() << "Client connected from" << ipAddress;
 }
-
+void MainWindow::onServerConnected(const QString& ipAddress)
+{
+    qDebug() << "Server connected from" << ipAddress;
+}
 void MainWindow::onClientDataReceived(QTcpSocket* clientSocket, const QByteArray& data)
 {
     QString message = QString::fromUtf8(data);
     chatPanel->receiveMessage(message);
 }
-
+void MainWindow::onServerDataReceived(QTcpSocket* serverSocket, const QByteArray& data)
+{
+    QString message = QString::fromUtf8(data);
+    chatPanel->receiveMessage(message);
+}
 void MainWindow::onConnectionStatusChanged(bool connected)
 {
     if (connected) {
