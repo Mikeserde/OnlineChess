@@ -5,9 +5,12 @@
 
 class Pawn : public ChessPiece
 {
+private:
+    bool playerColor;
+
 public:
-    Pawn(bool isWhite)
-        : ChessPiece(isWhite)
+    Pawn(bool isWhite, bool _playerColor)
+        : ChessPiece(isWhite), playerColor(_playerColor)
     {}
 
     QString getType() const override { return "P"; }
@@ -51,7 +54,7 @@ public:
     {
         QVector<QPoint> moves;
 
-        int direction = isWhite ? -1 : 1;
+        int direction = playerColor == isWhite ? -1 : 1;
         int nextRow = startRow + direction;
 
         // 检查前方一格是否为空
@@ -59,7 +62,7 @@ public:
             moves.append(QPoint(nextRow, startCol));
 
             // 如果在初始行，并且前方两格都为空，可以前进两格
-            int initialRow = isWhite ? 6 : 1;
+            int initialRow = playerColor == isWhite ? 6 : 1;
             if (startRow == initialRow && board[startRow + 2 * direction][startCol] == nullptr) {
                 moves.append(QPoint(startRow + 2 * direction, startCol));
             }

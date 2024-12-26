@@ -8,9 +8,11 @@
 #include <QWidget>
 #include "chatpanel.h"
 #include "chessboard.h"
-#include "networkserver.h"
+#include "NetworkServer.h"
 #include "statuspanel.h"
-#include "networkclient.h"
+#include "NetworkClient.h"
+
+const bool playerColor = true;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Instantiate the ChessBoard, StatusPanel, and ChatPanel
     chessBoard = new ChessBoard(this);
-    statusPanel = new StatusPanel(this);
     chatPanel = new ChatPanel(this);
+    statusPanel = new StatusPanel(playerColor, this);
 
     // Connect ChessBoard and StatusPanel
     chessBoard->setStatusPanel(statusPanel);
@@ -71,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &NetworkServer::clientDataReceived, this, &MainWindow::onDataReceived);
     connect(server, &NetworkServer::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, server, &NetworkServer::sendMoveMessageToClient);
+
+    chessBoard->initial(playerColor);
 
     // Create the NetworkClient
     const QString &host = "127.0.0.1";

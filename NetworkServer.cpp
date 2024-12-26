@@ -118,12 +118,12 @@ void NetworkServer::onReadyRead()
 
         if (data.startsWith("[MOVE]")) {
             // Handle move data
-            data = data.mid(5); // Remove the prefix
+            data = data.mid(6); // Remove the prefix
             emit clientMoveReceived(data);
             qDebug().noquote() << SERVER_PREFIX << "Move data received from client" << ipAddress << ":" << data;
         } else if (data.startsWith("[MSG]")) {
             // Handle regular message
-            data = data.mid(4); // Remove the prefix
+            data = data.mid(5); // Remove the prefix
             emit clientDataReceived(data);
             qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
         } else {
@@ -166,5 +166,7 @@ void NetworkServer::checkConnectionStatus()
 
 void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol)
 {
-
+    // Format: [MOVE]startRow,startCol,endRow,endCol
+    QString moveMessage = QString("%1,%2,%3,%4").arg(startRow).arg(startCol).arg(endRow).arg(endCol);
+    sendMessageToClient(moveMessage.toUtf8(), true);
 }

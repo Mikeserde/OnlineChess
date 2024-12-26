@@ -31,9 +31,6 @@ ChessBoard::ChessBoard(QWidget *parent)
     int spacing = 0; // 设定格子之间的间距，比如5像素
     gridLayout->setSpacing(spacing);
 
-    setupBoard();
-    initializePieces();
-
     // 固定窗口大小，考虑 padding 和 spacing 的影响
     int boardSize = 8 * squareSize + 2 * padding + 7 * spacing;
     setFixedSize(boardSize, boardSize); // 计算后的窗口大小
@@ -42,25 +39,17 @@ ChessBoard::ChessBoard(QWidget *parent)
     isGaming = false;
 }
 
+void ChessBoard::initial(bool _playerColor)
+{
+    playColor = _playerColor;
+    setupBoard();
+    initializePieces();
+}
+
 void ChessBoard::startGame()
 {
     isGaming = true;
     initialGameRecordFile();
-
-    step = 1;
-    castleIndex = 0;
-    eatOnePieceDistance = 0;
-}
-
-void ChessBoard::resetGame()
-{
-    isGaming = false;
-    currentMoveColor = true;
-
-    initialGameRecordFile();
-    setupBoard();
-    clearPieces();
-    initializePieces();
 
     step = 1;
     castleIndex = 0;
@@ -129,17 +118,20 @@ void ChessBoard::setupBoard()
         for (int col = 0; col < 8; ++col) {
             squares[row][col] = new QPushButton(this);
             squares[row][col]->setFixedSize(squareSize, squareSize);
-            // 设置背景颜色
-            if ((row + col) % 2 == 0) {
+
+            // Determine the color of the square based on the row and column
+            int adjustedRow = playColor ? row : 7 - row;
+            if ((adjustedRow + col) % 2 == 0) {
                 squares[row][col]->setStyleSheet(whiteSquareColor);
             } else {
                 squares[row][col]->setStyleSheet(blackSquareColor);
             }
 
-            // 初始化时设置属性，禁用点击效果
+            // 设置属性，禁用点击效果
             squares[row][col]->setFocusPolicy(Qt::NoFocus);
             squares[row][col]->setStyleSheet(squares[row][col]->styleSheet() + " border: none;");
 
+            // Add the square to the grid layout
             gridLayout->addWidget(squares[row][col], row, col);
             pieces[row][col] = nullptr; // 初始化棋盘为空
 
@@ -153,30 +145,30 @@ void ChessBoard::initializePieces()
 {
     // 设置棋子并将它们放置在棋盘上
     for (int col = 0; col < 8; ++col) {
-        setPiece(new Pawn(false), 1, col);
-        setPiece(new Pawn(true), 6, col);
+        setPiece(new Pawn(!playColor, playColor), 1, col);
+        setPiece(new Pawn(playColor, playColor), 6, col);
     }
 
-    setPiece(new Rook(false), 0, 0);
-    setPiece(new Rook(false), 0, 7);
-    setPiece(new Rook(true), 7, 0);
-    setPiece(new Rook(true), 7, 7);
+    setPiece(new Rook(!playColor), 0, 0);
+    setPiece(new Rook(!playColor), 0, 7);
+    setPiece(new Rook(playColor), 7, 0);
+    setPiece(new Rook(playColor), 7, 7);
 
-    setPiece(new Knight(false), 0, 1);
-    setPiece(new Knight(false), 0, 6);
-    setPiece(new Knight(true), 7, 1);
-    setPiece(new Knight(true), 7, 6);
+    setPiece(new Knight(!playColor), 0, 1);
+    setPiece(new Knight(!playColor), 0, 6);
+    setPiece(new Knight(playColor), 7, 1);
+    setPiece(new Knight(playColor), 7, 6);
 
-    setPiece(new Bishop(false), 0, 2);
-    setPiece(new Bishop(false), 0, 5);
-    setPiece(new Bishop(true), 7, 2);
-    setPiece(new Bishop(true), 7, 5);
+    setPiece(new Bishop(!playColor), 0, 2);
+    setPiece(new Bishop(!playColor), 0, 5);
+    setPiece(new Bishop(playColor), 7, 2);
+    setPiece(new Bishop(playColor), 7, 5);
 
-    setPiece(new Queen(false), 0, 3);
-    setPiece(new Queen(true), 7, 3);
+    setPiece(new Queen(!playColor), 0, 3);
+    setPiece(new Queen(playColor), 7, 3);
 
-    setPiece(new King(false, this), 0, 4);
-    setPiece(new King(true, this), 7, 4);
+    setPiece(new King(!playColor, this), 0, 4);
+    setPiece(new King(playColor, this), 7, 4);
 }
 
 void ChessBoard::setPiece(ChessPiece *piece, int row, int col)
@@ -261,12 +253,24 @@ void ChessBoard::clearHighlightedSquares()
 
 void ChessBoard::resetSquareColor(int row, int col)
 {
+    // If playColor is true (white player's perspective), row+col even means white square
     if ((row + col) % 2 == 0) {
-        squares[row][col]->setStyleSheet(whiteSquareColor);
+        // If playColor is true, then the bottom-left square (7,0) should be white.
+        if (playColor) {
+            squares[row][col]->setStyleSheet(whiteSquareColor);
+        } else {
+            squares[row][col]->setStyleSheet(blackSquareColor);
+        }
     } else {
-        squares[row][col]->setStyleSheet(blackSquareColor);
+        // If playColor is true, then the bottom-left square (7,0) should be black.
+        if (playColor) {
+            squares[row][col]->setStyleSheet(blackSquareColor);
+        } else {
+            squares[row][col]->setStyleSheet(whiteSquareColor);
+        }
     }
 }
+
 
 bool ChessBoard::isDraw()
 {
@@ -645,11 +649,13 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
 
     handleEnPassant(startRow, startCol, endRow, endCol, piece);
 
+    setPiece(piece, endRow, endCol);
+    // 处理升变
+    handlePromotion(endRow, endCol, piece);
     // 成功完成移动后交换动子方
     switchMove(startRow, startCol, endRow, endCol, piece);
 
-    recordMoveHistory(piece,
-                      QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
+    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
 
     // 检查是否和棋或被将杀
     checkForCheckmateOrDraw();
@@ -687,7 +693,7 @@ void ChessBoard::animatePieceMove(
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *&piece)
+void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
     // 向对方发送移动信息
     emit moveMessageSent(startRow, startCol, endRow, endCol);
@@ -703,10 +709,6 @@ void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, 
 
     // 调用动画函数
     animatePieceMove(startRow, startCol, endRow, endCol, piece);
-
-    setPiece(piece, endRow, endCol);
-    // 处理升变
-    handlePromotion(endRow, endCol, piece);
 
     // 更新位置并交换当前行动方
     currentMoveColor = !currentMoveColor;
@@ -779,9 +781,14 @@ bool ChessBoard::handleEnPassant(
     return false;
 }
 
-bool ChessBoard::handlePromotion(int endRow, int endCol, ChessPiece *&piece)
+void ChessBoard::handlePromotion(int endRow, int endCol, ChessPiece *&piece)
 {
-    if (dynamic_cast<Pawn *>(piece) != nullptr && (endRow == 0 || endRow == 7)) {
+    qDebug() << "piece promotion begin";
+
+    qDebug() << piece->getType();
+    if (piece->getType() == "P" && (endRow == 0 || endRow == 7)) {
+
+        qDebug() << "this is pawn promotion begin";
         PromotionDialog promotionDialog(this, piece->isWhitePiece());
 
         // 获取棋盘格的全局坐标位置
@@ -801,9 +808,8 @@ bool ChessBoard::handlePromotion(int endRow, int endCol, ChessPiece *&piece)
             setPiece(piece, endRow, endCol); // 确保棋盘设置了新棋子
         }
 
-        return true;
+        qDebug() << "piece promotion end";
     }
-    return false;
 }
 
 void ChessBoard::moveRookForCastling(int row, int rookStartCol, int rookEndCol)

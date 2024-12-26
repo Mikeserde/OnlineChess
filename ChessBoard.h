@@ -21,8 +21,8 @@ public:
     ChessBoard(QWidget *parent = nullptr);
 
     void setStatusPanel(StatusPanel *_statusPanel) { statusPanel = _statusPanel; }
+    void initial(bool playerColor);
     void startGame();
-    void resetGame();
     void endGame()
     {
         isGaming = true;
@@ -34,6 +34,7 @@ public:
     bool isSquareAttacked(QPoint square, bool iswhite);
 
 private:
+    bool playColor;
     StatusPanel *statusPanel;
     QVector<QString> boardStates; // 记录每一步的棋盘状态
     QVector<MoveHistoryEntry> moveHistory;
@@ -68,7 +69,7 @@ private:
 
     bool isMoveValid(int startRow, int startCol, int endRow, int endCol);
     void movePiece(int startRow, int startCol, int endRow, int endCol);
-    void switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *&piece);
+    void switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece);
     void animatePieceMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece);
 
     void clearPieces();
@@ -89,7 +90,7 @@ private:
     void moveRookForCastling(int row, int rookStartCol, int rookEndCol);
     bool handleCastling(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece);
     bool handleEnPassant(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece);
-    bool handlePromotion(int endRow, int endCol, ChessPiece *&piece);
+    void handlePromotion(int endRow, int endCol, ChessPiece *&piece);
     ChessPiece *showPromotionDialog(ChessPiece *piece);
 
     QString gameRecordFileName;

@@ -16,14 +16,12 @@ class StatusPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit StatusPanel(QWidget *parent = nullptr);
+    explicit StatusPanel(bool _playColor, QWidget *parent = nullptr);
     void setChessBoard(ChessBoard *_chessBoard) { chessBoard = _chessBoard; }
 
     // Method to start the game clock
     void startGame();
     void stopTimer() { gameTimer->stop(); }
-    // Method to reset the game
-    void resetGame();
     void switchTurns(); // Switch turns between players
     void addMoveHistoryToStatusPlane(QPair<QPoint, QPoint> move);
     void addMoveToHistory(const QString &move, int step); // Add a move to the history
@@ -31,12 +29,12 @@ public:
 
 private:
     ChessBoard *chessBoard;
+    bool playerColor;
 
     QLabel *statusLabel;      // Label to display game status information
     QComboBox *timeSelector;  // Dropdown for selecting time (5, 10, 15, 60 minutes)
     QTextEdit *moveHistory;   // TextEdit to display move history
     QPushButton *startButton; // Button to start the clock
-    QPushButton *resetButton;
 
     int whiteTime;          // White player's remaining time (in seconds)
     int blackTime;          // Black player's remaining time (in seconds)

@@ -51,12 +51,12 @@ void NetworkClient::onReadyRead()
         QByteArray data = socket->readAll();
         if (data.startsWith("[MOVE]")) {
             // Handle move data
-            data = data.mid(5); // Remove the prefix
+            data = data.mid(6); // Remove the prefix
             emit serverMoveReceived(data);
             qDebug().noquote() << CLIENT_PREFIX << "Move data received from server:" << data;
         } else if (data.startsWith("[MSG]")) {
             // Handle regular message
-            data = data.mid(4); // Remove the prefix
+            data = data.mid(5); // Remove the prefix
             emit serverDataReceived(data);
             qDebug().noquote() << CLIENT_PREFIX << "Chat message received from server:" << data;
         } else {
@@ -112,5 +112,7 @@ void NetworkClient::checkConnectionStatus()
 
 void NetworkClient::sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol)
 {
-
+    // Format: [MOVE]startRow,startCol,endRow,endCol
+    QString moveMessage = QString("%1,%2,%3,%4").arg(startRow).arg(startCol).arg(endRow).arg(endCol);
+    sendMessageToServer(moveMessage.toUtf8(), true);
 }
