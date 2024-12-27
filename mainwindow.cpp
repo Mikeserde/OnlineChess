@@ -104,7 +104,7 @@ void MainWindow::serverCreated() {
 
 void MainWindow::clientCreated() {
     // Create the NetworkClient
-    const QString &host = "127.0.0.1";
+    const QString &host = "172.16.20.118";
     client = new NetworkClient(host, 5010, this);
 
     connect(client, &NetworkClient::serverConnected, this, &MainWindow::onConnected);
