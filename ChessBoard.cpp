@@ -628,7 +628,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, b
 {
     if (!isGaming) return;
     ChessPiece *piece = pieces[startRow][startCol];
-    if (currentMoveColor != playerColor || (!piece && piece->isWhitePiece() != playerColor)) return;
+    if (!en || (currentMoveColor != playerColor || (!piece && piece->isWhitePiece() != playerColor))) return;
 
     qDebug() << "It's" << (currentMoveColor ? "White'" : "Black'") << "turn!";
 
@@ -650,6 +650,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, b
     // 成功完成移动后交换动子方
     switchMove(startRow, startCol, endRow, endCol, piece, en);
 
+    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
     // 检查是否和棋或被将杀
     checkForCheckmateOrDraw();
 }
@@ -694,7 +695,6 @@ void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, 
         emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
     }
 
-    // recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
     lastMoveEnd = QPoint(endRow, endCol);
