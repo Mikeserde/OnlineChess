@@ -7,11 +7,14 @@
 
 class King : public ChessPiece
 {
+private:
+    bool playerColor;
 public:
     ChessBoard *chessboard;
 
-    King(bool isWhite, ChessBoard *chessboard)
+    King(bool isWhite, ChessBoard *chessboard, bool _playerColor)
         : ChessPiece(isWhite)
+        , playerColor(_playerColor)
         , chessboard(chessboard)
     {}
 
@@ -73,7 +76,7 @@ public:
 
         // 王车易位逻辑
         if (!isMoved()) {
-            int baseRow = isWhitePiece() ? 7 : 0;
+            int baseRow = !playerColor ? 7 : 0;
 
             if (startRow == baseRow) {
                 // 王侧易位（Short castling）

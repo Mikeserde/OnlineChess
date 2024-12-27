@@ -167,8 +167,8 @@ void ChessBoard::initializePieces()
     setPiece(new Queen(!playerColor), 0, 3);
     setPiece(new Queen(playerColor), 7, 3);
 
-    setPiece(new King(!playerColor, this), 0, 4);
-    setPiece(new King(playerColor, this), 7, 4);
+    setPiece(new King(!playerColor, this, playerColor), 0, 4);
+    setPiece(new King(playerColor, this, playerColor), 7, 4);
 }
 
 void ChessBoard::setPiece(ChessPiece *piece, int row, int col, bool en)
@@ -916,7 +916,7 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
     }
     else if (pieceType == "K")
     {
-        piece = new King(!playerColor, this);
+        piece = new King(!playerColor, this, playerColor);
     }
     else if (pieceType == "R")
     {
