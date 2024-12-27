@@ -94,7 +94,7 @@ void MainWindow::serverCreated() {
 
     // Connect server signals to appropriate slots
     connect(server, &NetworkServer::clientConnected, this, &MainWindow::onConnected);
-    connect(server, &NetworkServer::clientDataReceived, this, &MainWindow::onDataReceived);
+    connect(server, &NetworkServer::clientChatDataReceived, this, &MainWindow::onDataReceived);
     connect(server, &NetworkServer::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, server, &NetworkServer::sendMoveMessageToClient);
     connect(server, &NetworkServer::clientMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
@@ -108,7 +108,7 @@ void MainWindow::clientCreated() {
     client = new NetworkClient(host, 5010, this);
 
     connect(client, &NetworkClient::serverConnected, this, &MainWindow::onConnected);
-    connect(client, &NetworkClient::serverDataReceived, this, &MainWindow::onDataReceived);
+    connect(client, &NetworkClient::serverChatDataReceived, this, &MainWindow::onDataReceived);
     connect(client, &NetworkClient::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, client, &NetworkClient::sendMoveMessageToServer);
     connect(client, &NetworkClient::serverMoveReceived, chessBoard, &ChessBoard::moveByOpponent);

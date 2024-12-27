@@ -650,8 +650,6 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
     // 成功完成移动后交换动子方
     switchMove(startRow, startCol, endRow, endCol, piece);
 
-
-
     // 检查是否和棋或被将杀
     checkForCheckmateOrDraw();
 }
@@ -696,7 +694,7 @@ void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, 
         emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
     }
 
-    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
+    // recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
     lastMoveEnd = QPoint(endRow, endCol);

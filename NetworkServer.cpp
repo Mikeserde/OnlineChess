@@ -140,7 +140,7 @@ void NetworkServer::onReadyRead()
         else if (data.startsWith("[MSG]")) {
             // Handle regular message
             data = data.mid(5); // Remove the prefix
-            emit clientDataReceived(data);
+            emit clientChatDataReceived(data);
             qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
         }
         else if (data.startsWith("[READY]")) {

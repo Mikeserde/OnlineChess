@@ -65,9 +65,10 @@ void NetworkClient::onReadyRead()
         else if (data.startsWith("[MSG]")) {
             // Handle regular message
             data = data.mid(5); // Remove the prefix
-            emit serverDataReceived(data);
+            emit serverChatDataReceived(data);
             qDebug().noquote() << CLIENT_PREFIX << "Chat message received from server:" << data;
-        } else if (data.startsWith("[START]")) {
+        }
+        else if (data.startsWith("[START]")) {
             data = data.mid(7);
             emit startGameAndSetClock(data.toInt());
             qDebug().noquote() << CLIENT_PREFIX << "START INFO received from server:" << data;

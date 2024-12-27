@@ -23,7 +23,7 @@ public:
     bool startServer(quint16 port);
 
 signals:
-    void clientDataReceived(const QByteArray &data);
+    void clientChatDataReceived(const QByteArray &data);
     void clientConnected(const QString &ipAddress, quint16 port);
     void connectionStatusChanged(bool connected);
     void serverStopped();

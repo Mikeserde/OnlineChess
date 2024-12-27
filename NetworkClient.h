@@ -19,7 +19,7 @@ public:
 
 signals:
     void connectionStatusChanged(bool connected);
-    void serverDataReceived(const QByteArray &data);
+    void serverChatDataReceived(const QByteArray &data);
     void serverConnected(const QString &host, quint16 port);
     void serverMoveReceived(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
