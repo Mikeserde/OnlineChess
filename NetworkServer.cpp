@@ -68,13 +68,19 @@ quint16 NetworkServer::serverPort() const
     return server->serverPort();
 }
 
-void NetworkServer::sendMessageToClient(const QByteArray &message, bool moveInfo)
+void NetworkServer::sendMessageToClient(const QByteArray &message, bool moveInfo, bool clockTime)
 {
     QByteArray messageWithPrefix;
 
     if (moveInfo) {
         messageWithPrefix = "[MOVE]" + message;
-    } else {
+    }
+    else if (clockTime)
+    {
+        messageWithPrefix = "[CLOCK]" + message;
+    }
+    else
+    {
         messageWithPrefix = "[MSG]" + message;
     }
 
@@ -119,14 +125,22 @@ void NetworkServer::onReadyRead()
         if (data.startsWith("[MOVE]")) {
             // Handle move data
             data = data.mid(6); // Remove the prefix
-            emit clientMoveReceived(data);
+            // Assuming 'data' is in the format: "startRow,startCol,endRow,endCol,pieceType"
+            QStringList parts = QString(data).split(',');
+            int startRow = parts[0].toInt();
+            int startCol = parts[1].toInt();
+            int endRow = parts[2].toInt();
+            int endCol = parts[3].toInt();
+            QString pieceType = parts[4];
+            emit clientMoveReceived(startRow, startCol, endRow, endCol, pieceType);
             qDebug().noquote() << SERVER_PREFIX << "Move data received from client" << ipAddress << ":" << data;
         } else if (data.startsWith("[MSG]")) {
             // Handle regular message
             data = data.mid(5); // Remove the prefix
             emit clientDataReceived(data);
             qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
-        } else {
+        }
+        else {
             qDebug().noquote() << SERVER_PREFIX << "Received invalid message from client" << ipAddress << ":" << data;
         }
     }
@@ -164,9 +178,16 @@ void NetworkServer::checkConnectionStatus()
 }
 
 
-void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol)
+void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
     // Format: [MOVE]startRow,startCol,endRow,endCol
-    QString moveMessage = QString("%1,%2,%3,%4").arg(startRow).arg(startCol).arg(endRow).arg(endCol);
-    sendMessageToClient(moveMessage.toUtf8(), true);
+    QString moveMessage = QString("%1,%2,%3,%4,%5").arg(startRow).arg(startCol).arg(endRow).arg(endCol).arg(pieceType);
+    sendMessageToClient(moveMessage.toUtf8(), 1);
+}
+
+
+void NetworkServer::setClientClock(int clockTime)
+{
+    const QByteArray message = QString("%1").arg(clockTime).toUtf8();
+    sendMessageToClient(message, 0, 1);
 }

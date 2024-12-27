@@ -18,16 +18,17 @@ public:
     void stopServer();
     bool isListening() const;
     quint16 serverPort() const;
-    void sendMessageToClient(const QByteArray &message, bool moveInfo = false);
+    void sendMessageToClient(const QByteArray &message, bool moveInfo = false, bool clockTime = false);
+    void setClientClock(int clockTime);
     bool startServer(quint16 port);
 
 signals:
     void clientDataReceived(const QByteArray &data);
-    void clientMoveReceived(const QByteArray &data);
     void clientConnected(const QString &ipAddress, quint16 port);
     void connectionStatusChanged(bool connected);
     void serverStopped();
     void serverError(const QString &error);
+    void clientMoveReceived(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
 private slots:
     void onConnected();
@@ -37,7 +38,7 @@ private slots:
     void checkConnectionStatus();
 
 public slots:
-    void sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol);
+    void sendMoveMessageToClient(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
 private:
     QTcpServer *server;

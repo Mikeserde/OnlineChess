@@ -50,16 +50,26 @@ void NetworkClient::onReadyRead()
     if (socket) {
         QByteArray data = socket->readAll();
         if (data.startsWith("[MOVE]")) {
-            // Handle move data
             data = data.mid(6); // Remove the prefix
-            emit serverMoveReceived(data);
+            // Assuming 'data' is in the format: "startRow,startCol,endRow,endCol,pieceType"
+            QStringList parts = QString(data).split(',');
+            int startRow = parts[0].toInt();
+            int startCol = parts[1].toInt();
+            int endRow = parts[2].toInt();
+            int endCol = parts[3].toInt();
+            QString pieceType = parts[4];
+            emit serverMoveReceived(startRow, startCol, endRow, endCol, pieceType);
             qDebug().noquote() << CLIENT_PREFIX << "Move data received from server:" << data;
         } else if (data.startsWith("[MSG]")) {
             // Handle regular message
             data = data.mid(5); // Remove the prefix
             emit serverDataReceived(data);
             qDebug().noquote() << CLIENT_PREFIX << "Chat message received from server:" << data;
-        } else {
+        } else if (data.startsWith("[CLOCK]")) {
+            data = data.mid(7);
+            emit setClientClock(data.toInt());
+        }
+        else {
             qDebug().noquote() << CLIENT_PREFIX << "Received invalid message from server:" << data;
         }
     }
@@ -110,9 +120,9 @@ void NetworkClient::checkConnectionStatus()
 }
 
 
-void NetworkClient::sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol)
+void NetworkClient::sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
     // Format: [MOVE]startRow,startCol,endRow,endCol
-    QString moveMessage = QString("%1,%2,%3,%4").arg(startRow).arg(startCol).arg(endRow).arg(endCol);
+    QString moveMessage = QString("%1,%2,%3,%4,%5").arg(startRow).arg(startCol).arg(endRow).arg(endCol).arg(pieceType);
     sendMessageToServer(moveMessage.toUtf8(), true);
 }

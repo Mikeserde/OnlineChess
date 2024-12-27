@@ -19,8 +19,10 @@ public:
 signals:
     void connectionStatusChanged(bool connected);
     void serverDataReceived(const QByteArray &data);
-    void serverMoveReceived(const QByteArray &data);
     void serverConnected(const QString &host, quint16 port);
+    void serverMoveReceived(int startRow, int startCol, int endRow, int endCol, QString pieceType);
+
+    void setClientClock(int clockTime);
 
 private slots:
     void onConnected();
@@ -30,7 +32,7 @@ private slots:
     void checkConnectionStatus();
 
 public slots:
-    void sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol);
+    void sendMoveMessageToServer(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
 private:
     QTcpSocket *socket;

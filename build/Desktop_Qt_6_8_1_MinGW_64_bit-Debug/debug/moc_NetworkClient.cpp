@@ -43,20 +43,23 @@ static constexpr auto qt_meta_stringdata_ZN13NetworkClientE = QtMocHelpers::stri
     "connected",
     "serverDataReceived",
     "data",
-    "serverMoveReceived",
     "serverConnected",
     "host",
     "port",
+    "serverMoveReceived",
+    "startRow",
+    "startCol",
+    "endRow",
+    "endCol",
+    "pieceType",
+    "setClientClock",
+    "clockTime",
     "onConnected",
     "onReadyRead",
     "onDisconnected",
     "onError",
     "checkConnectionStatus",
-    "sendMoveMessageToServer",
-    "startRow",
-    "startCol",
-    "endRow",
-    "endCol"
+    "sendMoveMessageToServer"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -68,32 +71,34 @@ Q_CONSTINIT static const uint qt_meta_data_ZN13NetworkClientE[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       4,       // signalCount
+       5,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    1,   74,    2, 0x06,    1 /* Public */,
-       4,    1,   77,    2, 0x06,    3 /* Public */,
-       6,    1,   80,    2, 0x06,    5 /* Public */,
-       7,    2,   83,    2, 0x06,    7 /* Public */,
+       1,    1,   80,    2, 0x06,    1 /* Public */,
+       4,    1,   83,    2, 0x06,    3 /* Public */,
+       6,    2,   86,    2, 0x06,    5 /* Public */,
+       9,    5,   91,    2, 0x06,    8 /* Public */,
+      15,    1,  102,    2, 0x06,   14 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      10,    0,   88,    2, 0x08,   10 /* Private */,
-      11,    0,   89,    2, 0x08,   11 /* Private */,
-      12,    0,   90,    2, 0x08,   12 /* Private */,
-      13,    0,   91,    2, 0x08,   13 /* Private */,
-      14,    0,   92,    2, 0x08,   14 /* Private */,
-      15,    4,   93,    2, 0x0a,   15 /* Public */,
+      17,    0,  105,    2, 0x08,   16 /* Private */,
+      18,    0,  106,    2, 0x08,   17 /* Private */,
+      19,    0,  107,    2, 0x08,   18 /* Private */,
+      20,    0,  108,    2, 0x08,   19 /* Private */,
+      21,    0,  109,    2, 0x08,   20 /* Private */,
+      22,    5,  110,    2, 0x0a,   21 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Bool,    3,
     QMetaType::Void, QMetaType::QByteArray,    5,
-    QMetaType::Void, QMetaType::QByteArray,    5,
-    QMetaType::Void, QMetaType::QString, QMetaType::UShort,    8,    9,
+    QMetaType::Void, QMetaType::QString, QMetaType::UShort,    7,    8,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::QString,   10,   11,   12,   13,   14,
+    QMetaType::Void, QMetaType::Int,   16,
 
  // slots: parameters
     QMetaType::Void,
@@ -101,7 +106,7 @@ Q_CONSTINIT static const uint qt_meta_data_ZN13NetworkClientE[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   16,   17,   18,   19,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::QString,   10,   11,   12,   13,   14,
 
        0        // eod
 };
@@ -121,13 +126,20 @@ Q_CONSTINIT const QMetaObject NetworkClient::staticMetaObject = { {
         // method 'serverDataReceived'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QByteArray &, std::false_type>,
-        // method 'serverMoveReceived'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<const QByteArray &, std::false_type>,
         // method 'serverConnected'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
         QtPrivate::TypeAndForceComplete<quint16, std::false_type>,
+        // method 'serverMoveReceived'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QString, std::false_type>,
+        // method 'setClientClock'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
         // method 'onConnected'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onReadyRead'
@@ -143,7 +155,8 @@ Q_CONSTINIT const QMetaObject NetworkClient::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<int, std::false_type>,
         QtPrivate::TypeAndForceComplete<int, std::false_type>,
         QtPrivate::TypeAndForceComplete<int, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QString, std::false_type>
     >,
     nullptr
 } };
@@ -155,14 +168,15 @@ void NetworkClient::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         switch (_id) {
         case 0: _t->connectionStatusChanged((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
         case 1: _t->serverDataReceived((*reinterpret_cast< std::add_pointer_t<QByteArray>>(_a[1]))); break;
-        case 2: _t->serverMoveReceived((*reinterpret_cast< std::add_pointer_t<QByteArray>>(_a[1]))); break;
-        case 3: _t->serverConnected((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<quint16>>(_a[2]))); break;
-        case 4: _t->onConnected(); break;
-        case 5: _t->onReadyRead(); break;
-        case 6: _t->onDisconnected(); break;
-        case 7: _t->onError(); break;
-        case 8: _t->checkConnectionStatus(); break;
-        case 9: _t->sendMoveMessageToServer((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[4]))); break;
+        case 2: _t->serverConnected((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<quint16>>(_a[2]))); break;
+        case 3: _t->serverMoveReceived((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[4])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[5]))); break;
+        case 4: _t->setClientClock((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 5: _t->onConnected(); break;
+        case 6: _t->onReadyRead(); break;
+        case 7: _t->onDisconnected(); break;
+        case 8: _t->onError(); break;
+        case 9: _t->checkConnectionStatus(); break;
+        case 10: _t->sendMoveMessageToServer((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[4])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[5]))); break;
         default: ;
         }
     }
@@ -183,16 +197,23 @@ void NetworkClient::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
             }
         }
         {
-            using _q_method_type = void (NetworkClient::*)(const QByteArray & );
-            if (_q_method_type _q_method = &NetworkClient::serverMoveReceived; *reinterpret_cast<_q_method_type *>(_a[1]) == _q_method) {
+            using _q_method_type = void (NetworkClient::*)(const QString & , quint16 );
+            if (_q_method_type _q_method = &NetworkClient::serverConnected; *reinterpret_cast<_q_method_type *>(_a[1]) == _q_method) {
                 *result = 2;
                 return;
             }
         }
         {
-            using _q_method_type = void (NetworkClient::*)(const QString & , quint16 );
-            if (_q_method_type _q_method = &NetworkClient::serverConnected; *reinterpret_cast<_q_method_type *>(_a[1]) == _q_method) {
+            using _q_method_type = void (NetworkClient::*)(int , int , int , int , QString );
+            if (_q_method_type _q_method = &NetworkClient::serverMoveReceived; *reinterpret_cast<_q_method_type *>(_a[1]) == _q_method) {
                 *result = 3;
+                return;
+            }
+        }
+        {
+            using _q_method_type = void (NetworkClient::*)(int );
+            if (_q_method_type _q_method = &NetworkClient::setClientClock; *reinterpret_cast<_q_method_type *>(_a[1]) == _q_method) {
+                *result = 4;
                 return;
             }
         }
@@ -218,14 +239,14 @@ int NetworkClient::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 11;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 11)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }
@@ -245,16 +266,23 @@ void NetworkClient::serverDataReceived(const QByteArray & _t1)
 }
 
 // SIGNAL 2
-void NetworkClient::serverMoveReceived(const QByteArray & _t1)
+void NetworkClient::serverConnected(const QString & _t1, quint16 _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 
 // SIGNAL 3
-void NetworkClient::serverConnected(const QString & _t1, quint16 _t2)
+void NetworkClient::serverMoveReceived(int _t1, int _t2, int _t3, int _t4, QString _t5)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t4))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t5))) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);
+}
+
+// SIGNAL 4
+void NetworkClient::setClientClock(int _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 QT_WARNING_POP

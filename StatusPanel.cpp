@@ -8,6 +8,7 @@
 
 StatusPanel::StatusPanel(bool _playerColor, QWidget *parent)
     : QWidget(parent), playerColor(_playerColor)
+    , isReady(0)
     , whiteTime(0)
     , blackTime(0)
 {
@@ -60,7 +61,12 @@ void StatusPanel::initializeUI()
     updateClockDisplay(); // 将白棋和黑棋的初始时间更新到 UI
 
     // Create the start button
-    startButton = new QPushButton("Start Game", this);
+    readyButton = new QPushButton("Ready", this);
+    readyButton->setFixedSize(100, 30); // 设置按钮的固定宽度为100，高度为50
+    connect(readyButton, &QPushButton::clicked, this, &StatusPanel::readyForGame);
+
+    // Create the start button
+    startButton = new QPushButton("Start", this);
     startButton->setFixedSize(100, 30); // 设置按钮的固定宽度为100，高度为50
     connect(startButton, &QPushButton::clicked, this, &StatusPanel::startGame);
 
@@ -107,7 +113,18 @@ void StatusPanel::initializeUI()
     // 创建布局以将按钮居中
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();           // 添加可伸缩空间到左侧
-    buttonLayout->addWidget(startButton); // 添加开始按钮
+
+    if (playerColor)
+    {
+        buttonLayout->addWidget(startButton); // 添加开始按钮
+        readyButton->hide();
+    }
+    else
+    {
+        buttonLayout->addWidget(readyButton); // 添加准备按钮
+        startButton->hide();
+    }
+
     buttonLayout->addStretch();           // 添加可伸缩空间到右侧
 
     // Add the button layout to the main vertical layout
@@ -117,6 +134,13 @@ void StatusPanel::initializeUI()
     setLayout(mainLayout);
 }
 
+void StatusPanel::readyForGame()
+{
+    isReady = 1;
+    readyButton->setEnabled(false);
+    readyButton->setText("");
+}
+
 void StatusPanel::startGame()
 {
     if (chessBoard)
@@ -124,6 +148,16 @@ void StatusPanel::startGame()
 
     // Get selected time from the time selector
     int selectedTime = timeSelector->currentData().toInt();
+    initialClock(selectedTime);
+    emit setClientClcok(selectedTime);
+
+    // Disable the start button and time selector
+    startButton->setEnabled(false);
+    startButton->setText("");
+    timeSelector->setEnabled(false);
+}
+
+void StatusPanel::initialClock(int selectedTime) {
     whiteTime = blackTime = selectedTime;
 
     // Update the clocks
@@ -131,10 +165,6 @@ void StatusPanel::startGame()
 
     // Start the timer
     gameTimer->start(1000);
-
-    // Disable the start button and time selector
-    startButton->setEnabled(false);
-    timeSelector->setEnabled(false);
 }
 
 void StatusPanel::updateClockDisplay()
@@ -269,3 +299,10 @@ void StatusPanel::addMoveToHistory(const QString &move, int step)
     if (step % 2)
         moveHistory->append(QString());
 }
+
+
+void StatusPanel::getClockTime(int clockTime)
+{
+    initialClock(clockTime);
+}
+

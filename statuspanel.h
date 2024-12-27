@@ -20,21 +20,29 @@ public:
     void setChessBoard(ChessBoard *_chessBoard) { chessBoard = _chessBoard; }
 
     // Method to start the game clock
+    void readyForGame();
     void startGame();
+    void initialClock(int selectedTime);
+    void getClockTime(int clockTime);
     void stopTimer() { gameTimer->stop(); }
     void switchTurns(); // Switch turns between players
     void addMoveHistoryToStatusPlane(QPair<QPoint, QPoint> move);
     void addMoveToHistory(const QString &move, int step); // Add a move to the history
     int getGameTime() { return timeSelector->currentData().toInt(); }
 
+signals:
+    void setClientClcok(int selectedTime);
+
 private:
     ChessBoard *chessBoard;
     bool playerColor;
+    bool isReady;
 
     QLabel *statusLabel;      // Label to display game status information
     QComboBox *timeSelector;  // Dropdown for selecting time (5, 10, 15, 60 minutes)
     QTextEdit *moveHistory;   // TextEdit to display move history
-    QPushButton *startButton; // Button to start the clock
+    QPushButton *readyButton; // Button to ready the clock
+    QPushButton *startButton; // Button to ready the clock
 
     int whiteTime;          // White player's remaining time (in seconds)
     int blackTime;          // Black player's remaining time (in seconds)
