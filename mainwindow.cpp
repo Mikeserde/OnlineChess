@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     playerColor = true;
+    // playerColor = false;
     server = nullptr;
     client = nullptr;
 
