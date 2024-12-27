@@ -628,7 +628,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
 {
     if (!isGaming) return;
     ChessPiece *piece = pieces[startRow][startCol];
-    if ((currentMoveColor != playerColor && !piece) || piece->isWhitePiece() != playerColor) return;
+    if (currentMoveColor != playerColor && (!piece && piece->isWhitePiece() != playerColor)) return;
 
     qDebug() << "It's" << (currentMoveColor ? "White'" : "Black'") << "turn!";
 
@@ -935,6 +935,6 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
         piece = new Pawn(currentMoveColor, playerColor);
     }
 
-    setPiece(piece, 7-endRow, startCol, true);
+    setPiece(piece, 7-endRow, endCol, true);
     switchMove(7-startRow, startCol, 7-endRow, endCol, piece, true);
 }
