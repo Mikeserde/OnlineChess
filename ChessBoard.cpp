@@ -762,8 +762,8 @@ bool ChessBoard::handleCastling(int startRow, int startCol, int endRow, int endC
 bool ChessBoard::handleEnPassant(
     int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
-    if (dynamic_cast<Pawn *>(piece) != nullptr && pieces[endRow][endCol] == nullptr
-        && lastMovedPiece && dynamic_cast<Pawn *>(lastMovedPiece) != nullptr
+    if (piece->getType() == "P" && pieces[endRow][endCol] == nullptr
+        && lastMovedPiece && lastMovedPiece->getType() == "P"
         && abs(lastMoveEnd.x() - lastMoveStart.x()) == 2 && lastMoveEnd.y() == endCol
         && startRow == lastMoveEnd.x() && abs(lastMoveEnd.y() - startCol) == 1) {
         qDebug() << "En Passant!";
@@ -936,6 +936,6 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
     }
 
     setPiece(piece, 7-endRow, endCol, true);
-    handleEnPassant(7-startRow, startCol, 7-endRow, endCol, piece);
     switchMove(7-startRow, startCol, 7-endRow, endCol, piece, true);
+    handleEnPassant(7-startRow, startCol, 7-endRow, endCol, piece);
 }
