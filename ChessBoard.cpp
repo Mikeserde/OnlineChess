@@ -624,7 +624,7 @@ bool ChessBoard::isMoveValid(int startRow, int startCol, int endRow, int endCol)
                               lastMoveEnd);
 }
 
-void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
+void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, bool en)
 {
     if (!isGaming) return;
     ChessPiece *piece = pieces[startRow][startCol];
@@ -648,7 +648,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
     // 处理升变
     handlePromotion(endRow, endCol, piece);
     // 成功完成移动后交换动子方
-    switchMove(startRow, startCol, endRow, endCol, piece);
+    switchMove(startRow, startCol, endRow, endCol, piece, en);
 
     // 检查是否和棋或被将杀
     checkForCheckmateOrDraw();
@@ -908,33 +908,5 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
 
 void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
-    ChessPiece * piece = nullptr;
-    delete pieces[7-startRow][startCol];
-    if (pieceType == "Q")
-    {
-        piece = new Queen(!playerColor);
-    }
-    else if (pieceType == "K")
-    {
-        piece = new King(!playerColor, this, playerColor);
-    }
-    else if (pieceType == "R")
-    {
-        piece = new Rook(!playerColor);
-    }
-    else if (pieceType == "N")
-    {
-        piece = new Knight(!playerColor);
-    }
-    else if (pieceType == "B")
-    {
-        piece = new Bishop(!playerColor);
-    }
-    else
-    {
-        piece = new Pawn(!playerColor, playerColor);
-    }
-
-    setPiece(piece, 7-endRow, endCol, true);
-    switchMove(7-startRow, startCol, 7-endRow, endCol, piece, true);
+    movePiece(7-startRow, startCol, 7-endRow, endCol, true);
 }

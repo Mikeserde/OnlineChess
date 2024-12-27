@@ -76,7 +76,7 @@ public:
 
         // 王车易位逻辑
         if (!isMoved()) {
-            int baseRow = !playerColor ? 7 : 0;
+            int baseRow = playerColor == isWhitePiece() ? 0 : 7;
 
             if (startRow == baseRow) {
                 // 王侧易位（Short castling）
