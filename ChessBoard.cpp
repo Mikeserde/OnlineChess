@@ -628,7 +628,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
 {
     if (!isGaming) return;
     ChessPiece *piece = pieces[startRow][startCol];
-    if (currentMoveColor != playerColor && (!piece && piece->isWhitePiece() != playerColor)) return;
+    if (currentMoveColor != playerColor || (!piece && piece->isWhitePiece() != playerColor)) return;
 
     qDebug() << "It's" << (currentMoveColor ? "White'" : "Black'") << "turn!";
 
@@ -912,27 +912,27 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
     delete pieces[7-startRow][startCol];
     if (pieceType == "Q")
     {
-        piece = new Queen(currentMoveColor);
+        piece = new Queen(!playerColor);
     }
     else if (pieceType == "K")
     {
-        piece = new King(currentMoveColor, this);
+        piece = new King(!playerColor, this);
     }
     else if (pieceType == "R")
     {
-        piece = new Rook(currentMoveColor);
+        piece = new Rook(!playerColor);
     }
     else if (pieceType == "N")
     {
-        piece = new Knight(currentMoveColor);
+        piece = new Knight(!playerColor);
     }
     else if (pieceType == "B")
     {
-        piece = new Bishop(currentMoveColor);
+        piece = new Bishop(!playerColor);
     }
     else
     {
-        piece = new Pawn(currentMoveColor, playerColor);
+        piece = new Pawn(!playerColor, playerColor);
     }
 
     setPiece(piece, 7-endRow, endCol, true);
