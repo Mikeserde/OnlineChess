@@ -15,6 +15,7 @@ SOURCES += \
     NetworkServer.cpp \
     PromotionDialog.cpp \
     StatusPanel.cpp \
+    chesslobby.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -32,6 +33,7 @@ HEADERS += \
     Queen.h \
     Rook.h \
     StatusPanel.h \
+    chesslobby.h \
     mainwindow.h
 
 FORMS += \

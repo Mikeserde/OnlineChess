@@ -28,7 +28,7 @@ private slots:
 
 private:
     void sendMessage(const QByteArray &message);
-
+    bool eventFilter(QObject *obj, QEvent *event);
     ChessBoard *chessBoard;
     StatusPanel *statusPanel;
     ChatPanel *chatPanel;

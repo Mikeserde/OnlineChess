@@ -1,8 +1,10 @@
-#include "mainwindow.h"
-
+#include <QObject>
+#include <QStackedWidget>
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include "mainwindow.h"
+#include "chesslobby.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +19,30 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    MainWindow w;
-    w.show();
+
+    // 创建MainWindow实例以获取其大小
+    MainWindow *mainWindow = new MainWindow;
+    QSize mainWindowSize = mainWindow->size();
+
+    // 创建ChessLobby实例并设置大小
+    ChessLobby *lobby = new ChessLobby;
+    lobby->resize(mainWindowSize); // 设置lobby的大小与mainwindow一致
+
+    // 创建QStackedWidget
+    QStackedWidget *stackedWidget = new QStackedWidget;
+
+    // 将它们添加到QStackedWidget中
+    stackedWidget->addWidget(lobby);
+    stackedWidget->addWidget(mainWindow);
+
+    // 设置ChessLobby为初始页面
+    stackedWidget->setCurrentIndex(0);
+
+    // 连接信号和槽
+    QObject::connect(lobby, &ChessLobby::StartGame, [stackedWidget](){ stackedWidget->setCurrentIndex(1); });
+
+    // 显示stackedWidget
+    stackedWidget->show();
+
     return a.exec();
 }
