@@ -122,7 +122,8 @@ void NetworkServer::onReadyRead()
         QByteArray data = clientSocket->readAll();
         QString ipAddress = clientSocket->peerAddress().toString();
 
-        if (data.startsWith("[MOVE]")) {
+        if (data.startsWith("[MOVE]"))
+        {
             // Handle move data
             data = data.mid(6); // Remove the prefix
             // Assuming 'data' is in the format: "startRow,startCol,endRow,endCol,pieceType"
@@ -134,15 +135,17 @@ void NetworkServer::onReadyRead()
             QString pieceType = parts[4];
             emit clientMoveReceived(startRow, startCol, endRow, endCol, pieceType);
             qDebug().noquote() << SERVER_PREFIX << "Move data received from client" << ipAddress << ":" << data;
-        } else if (data.startsWith("[MSG]")) {
+        }
+        else if (data.startsWith("[MSG]")) {
             // Handle regular message
             data = data.mid(5); // Remove the prefix
             emit clientDataReceived(data);
             qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
-        } else if (data.startsWith("[READY]")) {
+        }
+        else if (data.startsWith("[READY]")) {
             // Handle regular message
             emit clientReadyInfoReceived();
-            qDebug().noquote() << SERVER_PREFIX << "Chat message received from client" << ipAddress << ":" << data;
+            qDebug().noquote() << SERVER_PREFIX << "READY INFO received from client" << ipAddress << ":" << data;
         }
         else {
             qDebug().noquote() << SERVER_PREFIX << "Received invalid message from client" << ipAddress << ":" << data;

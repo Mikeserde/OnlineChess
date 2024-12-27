@@ -16,7 +16,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    playerColor = 0;
+    playerColor = false;
 
     placeWidgets();
     chessBoard->initial(playerColor);

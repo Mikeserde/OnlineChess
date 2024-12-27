@@ -49,7 +49,8 @@ void NetworkClient::onReadyRead()
 {
     if (socket) {
         QByteArray data = socket->readAll();
-        if (data.startsWith("[MOVE]")) {
+        if (data.startsWith("[MOVE]"))
+        {
             data = data.mid(6); // Remove the prefix
             // Assuming 'data' is in the format: "startRow,startCol,endRow,endCol,pieceType"
             QStringList parts = QString(data).split(',');
@@ -60,7 +61,8 @@ void NetworkClient::onReadyRead()
             QString pieceType = parts[4];
             emit serverMoveReceived(startRow, startCol, endRow, endCol, pieceType);
             qDebug().noquote() << CLIENT_PREFIX << "Move data received from server:" << data;
-        } else if (data.startsWith("[MSG]")) {
+        }
+        else if (data.startsWith("[MSG]")) {
             // Handle regular message
             data = data.mid(5); // Remove the prefix
             emit serverDataReceived(data);
@@ -68,6 +70,7 @@ void NetworkClient::onReadyRead()
         } else if (data.startsWith("[START]")) {
             data = data.mid(7);
             emit startGameAndSetClock(data.toInt());
+            qDebug().noquote() << CLIENT_PREFIX << "START INFO received from server:" << data;
         }
         else {
             qDebug().noquote() << CLIENT_PREFIX << "Received invalid message from server:" << data;
@@ -91,9 +94,11 @@ void NetworkClient::sendMessageToServer(const QByteArray &message, bool moveInfo
 {
     QByteArray messageWithPrefix;
 
-    if (moveInfo) {
+    if (moveInfo)
+    {
         messageWithPrefix = "[MOVE]" + message;
-    } else if (readyInfo)
+    }
+    else if (readyInfo)
     {
         messageWithPrefix = "[READY]" + message;
     }
@@ -134,5 +139,5 @@ void NetworkClient::sendMoveMessageToServer(int startRow, int startCol, int endR
 
 void NetworkClient::sentReadyInfoToServer() {
     const QByteArray message = "";
-    sendMessageToServer(message, 0, 1);
+    sendMessageToServer(message, false, true);
 }

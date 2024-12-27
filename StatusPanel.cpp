@@ -136,7 +136,6 @@ void StatusPanel::initializeUI()
 
 void StatusPanel::readyForGame()
 {
-    isReady = 1;
     readyButton->setEnabled(false);
     readyButton->setText("");
 
@@ -167,6 +166,7 @@ void StatusPanel::startGame()
 
 void StatusPanel::enableStartButton()
 {
+    isReady = 1;
     startButton->setEnabled(true);
 }
 
