@@ -627,11 +627,8 @@ bool ChessBoard::isMoveValid(int startRow, int startCol, int endRow, int endCol)
 void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
 {
     if (!isGaming) return;
-    // if (currentMoveColor != playColor) return;
-
     ChessPiece *piece = pieces[startRow][startCol];
-    if (!piece || piece->isWhitePiece() != currentMoveColor)
-        return;
+    if (currentMoveColor != playerColor && !piece) return;
 
     qDebug() << "It's" << (currentMoveColor ? "White'" : "Black'") << "turn!";
 
@@ -691,10 +688,13 @@ void ChessBoard::animatePieceMove(
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
+void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece, bool en)
 {
     // 向对方发送移动信息
-    emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
+    if (!en)
+    {
+        emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
+    }
 
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
@@ -909,9 +909,33 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
 
 void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
-    if (pieceType == "Q") setPiece(new Queen(currentMoveColor), startRow, startCol, 1);
-    else if (pieceType == "R") setPiece(new Rook(currentMoveColor), startRow, startCol, 1);
-    else if (pieceType == "N") setPiece(new Knight(currentMoveColor), startRow, startCol, 1);
-    else if (pieceType == "B") setPiece(new Bishop(currentMoveColor), startRow, startCol, 1);
-    movePiece(startRow, startCol, endRow, endCol);
+    ChessPiece * piece = nullptr;
+    delete pieces[7-startRow][startCol];
+    if (pieceType == "Q")
+    {
+        piece = new Queen(currentMoveColor);
+    }
+    else if (pieceType == "K")
+    {
+        piece = new King(currentMoveColor, this);
+    }
+    else if (pieceType == "R")
+    {
+        piece = new Rook(currentMoveColor);
+    }
+    else if (pieceType == "N")
+    {
+        piece = new Knight(currentMoveColor);
+    }
+    else if (pieceType == "B")
+    {
+        piece = new Bishop(currentMoveColor);
+    }
+    else
+    {
+        piece = new Pawn(currentMoveColor, currentMoveColor);
+    }
+
+    setPiece(piece, 7-endRow, startCol, true);
+    switchMove(7-startRow, startCol, 7-endRow, endCol, piece, true);
 }

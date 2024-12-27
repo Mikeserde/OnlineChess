@@ -72,7 +72,8 @@ void NetworkServer::sendMessageToClient(const QByteArray &message, bool moveInfo
 {
     QByteArray messageWithPrefix;
 
-    if (moveInfo) {
+    if (moveInfo)
+    {
         messageWithPrefix = "[MOVE]" + message;
     }
     else if (startInfo)

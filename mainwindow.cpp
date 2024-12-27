@@ -16,12 +16,14 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    playerColor = false;
+    playerColor = true;
+    server = nullptr;
+    client = nullptr;
 
     placeWidgets();
     chessBoard->initial(playerColor);
     serverCreated();
-    clientCreated();
+    // clientCreated();
     connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }
 
