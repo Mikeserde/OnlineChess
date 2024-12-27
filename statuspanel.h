@@ -23,6 +23,8 @@ public:
     void readyForGame();
     void startGame();
     void initialClock(int selectedTime);
+    void enableStartButton();
+    void synClockAndStartGame(int selectedTime);
     void getClockTime(int clockTime);
     void stopTimer() { gameTimer->stop(); }
     void switchTurns(); // Switch turns between players
@@ -32,6 +34,7 @@ public:
 
 signals:
     void setClientClcok(int selectedTime);
+    void sentReadyInfoToServer();
 
 private:
     ChessBoard *chessBoard;

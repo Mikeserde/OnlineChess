@@ -27,7 +27,13 @@ private slots:
     void onSendMessageClicked(const QString &message);
 
 private:
+    bool playerColor;
+
     void sendMessage(const QByteArray &message);
+
+    void placeWidgets();
+    void clientCreated();
+    void serverCreated();
 
     ChessBoard *chessBoard;
     StatusPanel *statusPanel;

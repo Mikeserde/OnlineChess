@@ -12,11 +12,31 @@
 #include "statuspanel.h"
 #include "NetworkClient.h"
 
-const bool playerColor = true;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    playerColor = 0;
+
+    placeWidgets();
+    chessBoard->initial(playerColor);
+    serverCreated();
+    clientCreated();
+    connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
+}
+
+MainWindow::~MainWindow()
+{
+    if (server) {
+        server->stopServer();
+        delete server;
+    }
+    if (client) {
+        delete client;
+    }
+}
+
+void MainWindow::placeWidgets() {
     // Create a central widget
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
@@ -64,10 +84,9 @@ MainWindow::MainWindow(QWidget *parent)
     setFixedSize(newWidth * 1.2, newHeight);
 
     setWindowIcon(QIcon(":/images/chess_icon.jpg"));
+}
 
-
-    chessBoard->initial(playerColor);
-
+void MainWindow::serverCreated() {
     // Create the NetworkServer
     server = new NetworkServer(5010, this);
 
@@ -77,9 +96,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &NetworkServer::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, server, &NetworkServer::sendMoveMessageToClient);
     connect(server, &NetworkServer::clientMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
-    connect(statusPanel, &StatusPanel::setClientClcok, server, &NetworkServer::setClientClock);
+    connect(server, &NetworkServer::clientReadyInfoReceived, statusPanel, &StatusPanel::enableStartButton);
+    connect(statusPanel, &StatusPanel::setClientClcok, server, &NetworkServer::sendClockInfoToClient);
+}
 
-
+void MainWindow::clientCreated() {
     // Create the NetworkClient
     const QString &host = "127.0.0.1";
     client = new NetworkClient(host, 5010, this);
@@ -89,20 +110,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, &NetworkClient::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(chessBoard, &ChessBoard::moveMessageSent, client, &NetworkClient::sendMoveMessageToServer);
     connect(client, &NetworkClient::serverMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
-    connect(client, &NetworkClient::setClientClock, statusPanel, &StatusPanel::initialClock);
-
-    connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
-}
-
-MainWindow::~MainWindow()
-{
-    if (server) {
-        server->stopServer();
-        delete server;
-    }
-    if (client) {
-        delete client;
-    }
+    connect(client, &NetworkClient::startGameAndSetClock, statusPanel, &StatusPanel::synClockAndStartGame);
+    connect(statusPanel, &StatusPanel::sentReadyInfoToServer, client, &NetworkClient::sentReadyInfoToServer);
 }
 
 void MainWindow::onConnected(const QString &ipAddress, quint16 port)

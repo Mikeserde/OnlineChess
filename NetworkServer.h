@@ -19,7 +19,7 @@ public:
     bool isListening() const;
     quint16 serverPort() const;
     void sendMessageToClient(const QByteArray &message, bool moveInfo = false, bool clockTime = false);
-    void setClientClock(int clockTime);
+    void sendClockInfoToClient(int clockTime);
     bool startServer(quint16 port);
 
 signals:
@@ -29,6 +29,7 @@ signals:
     void serverStopped();
     void serverError(const QString &error);
     void clientMoveReceived(int startRow, int startCol, int endRow, int endCol, QString pieceType);
+    void clientReadyInfoReceived();
 
 private slots:
     void onConnected();

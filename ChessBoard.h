@@ -36,7 +36,7 @@ public:
     void moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
 private:
-    bool playColor;
+    bool playerColor;
     StatusPanel *statusPanel;
     QVector<QString> boardStates; // 记录每一步的棋盘状态
     QVector<MoveHistoryEntry> moveHistory;

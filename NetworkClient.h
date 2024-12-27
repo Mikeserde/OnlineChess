@@ -14,7 +14,8 @@ public:
     explicit NetworkClient(const QString &host, quint16 port, QObject *parent = nullptr);
     ~NetworkClient();
 
-    void sendMessageToServer(const QByteArray &message, bool moveInfo = false);
+    void sendMessageToServer(const QByteArray &message, bool moveInfo = false, bool readyInfo = false);
+    void sentReadyInfoToServer();
 
 signals:
     void connectionStatusChanged(bool connected);
@@ -22,7 +23,7 @@ signals:
     void serverConnected(const QString &host, quint16 port);
     void serverMoveReceived(int startRow, int startCol, int endRow, int endCol, QString pieceType);
 
-    void setClientClock(int clockTime);
+    void startGameAndSetClock(int clockTime);
 
 private slots:
     void onConnected();

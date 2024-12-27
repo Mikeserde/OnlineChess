@@ -65,9 +65,9 @@ void NetworkClient::onReadyRead()
             data = data.mid(5); // Remove the prefix
             emit serverDataReceived(data);
             qDebug().noquote() << CLIENT_PREFIX << "Chat message received from server:" << data;
-        } else if (data.startsWith("[CLOCK]")) {
+        } else if (data.startsWith("[START]")) {
             data = data.mid(7);
-            emit setClientClock(data.toInt());
+            emit startGameAndSetClock(data.toInt());
         }
         else {
             qDebug().noquote() << CLIENT_PREFIX << "Received invalid message from server:" << data;
@@ -87,13 +87,18 @@ void NetworkClient::onError()
     qDebug().noquote() << CLIENT_PREFIX << "Error occurred:" << socket->errorString();
 }
 
-void NetworkClient::sendMessageToServer(const QByteArray &message, bool moveInfo)
+void NetworkClient::sendMessageToServer(const QByteArray &message, bool moveInfo, bool readyInfo)
 {
     QByteArray messageWithPrefix;
 
     if (moveInfo) {
         messageWithPrefix = "[MOVE]" + message;
-    } else {
+    } else if (readyInfo)
+    {
+        messageWithPrefix = "[READY]" + message;
+    }
+    else
+    {
         messageWithPrefix = "[MSG]" + message;
     }
 
@@ -125,4 +130,9 @@ void NetworkClient::sendMoveMessageToServer(int startRow, int startCol, int endR
     // Format: [MOVE]startRow,startCol,endRow,endCol
     QString moveMessage = QString("%1,%2,%3,%4,%5").arg(startRow).arg(startCol).arg(endRow).arg(endCol).arg(pieceType);
     sendMessageToServer(moveMessage.toUtf8(), true);
+}
+
+void NetworkClient::sentReadyInfoToServer() {
+    const QByteArray message = "";
+    sendMessageToServer(message, 0, 1);
 }

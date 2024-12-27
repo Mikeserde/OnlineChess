@@ -139,14 +139,22 @@ void StatusPanel::readyForGame()
     isReady = 1;
     readyButton->setEnabled(false);
     readyButton->setText("");
+
+    emit sentReadyInfoToServer();
 }
 
 void StatusPanel::startGame()
 {
+    if (!isReady)
+    {
+        // 如果startButton不可用，弹出一个信息框
+        QMessageBox::information(this, "INFO", "Other player doesn't ready!");
+        return; // 直接返回，避免执行后续的游戏开始逻辑
+    }
+
     if (chessBoard)
         chessBoard->startGame();
 
-    // Get selected time from the time selector
     int selectedTime = timeSelector->currentData().toInt();
     initialClock(selectedTime);
     emit setClientClcok(selectedTime);
@@ -154,6 +162,22 @@ void StatusPanel::startGame()
     // Disable the start button and time selector
     startButton->setEnabled(false);
     startButton->setText("");
+    timeSelector->setEnabled(false);
+}
+
+void StatusPanel::enableStartButton()
+{
+    startButton->setEnabled(true);
+}
+
+void StatusPanel::synClockAndStartGame(int selectedTime)
+{
+    if (chessBoard)
+        chessBoard->startGame();
+
+    initialClock(selectedTime);
+    readyButton->setEnabled(false);
+    readyButton->setText("");
     timeSelector->setEnabled(false);
 }
 

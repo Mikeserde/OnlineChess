@@ -41,7 +41,7 @@ ChessBoard::ChessBoard(QWidget *parent)
 
 void ChessBoard::initial(bool _playerColor)
 {
-    playColor = _playerColor;
+    playerColor = _playerColor;
     setupBoard();
     initializePieces();
 }
@@ -120,7 +120,7 @@ void ChessBoard::setupBoard()
             squares[row][col]->setFixedSize(squareSize, squareSize);
 
             // Determine the color of the square based on the row and column
-            int adjustedRow = playColor ? row : 7 - row;
+            int adjustedRow = playerColor ? row : 7 - row;
             if ((adjustedRow + col) % 2 == 0) {
                 squares[row][col]->setStyleSheet(whiteSquareColor);
             } else {
@@ -145,30 +145,30 @@ void ChessBoard::initializePieces()
 {
     // 设置棋子并将它们放置在棋盘上
     for (int col = 0; col < 8; ++col) {
-        setPiece(new Pawn(!playColor, playColor), 1, col);
-        setPiece(new Pawn(playColor, playColor), 6, col);
+        setPiece(new Pawn(!playerColor, playerColor), 1, col);
+        setPiece(new Pawn(playerColor, playerColor), 6, col);
     }
 
-    setPiece(new Rook(!playColor), 0, 0);
-    setPiece(new Rook(!playColor), 0, 7);
-    setPiece(new Rook(playColor), 7, 0);
-    setPiece(new Rook(playColor), 7, 7);
+    setPiece(new Rook(!playerColor), 0, 0);
+    setPiece(new Rook(!playerColor), 0, 7);
+    setPiece(new Rook(playerColor), 7, 0);
+    setPiece(new Rook(playerColor), 7, 7);
 
-    setPiece(new Knight(!playColor), 0, 1);
-    setPiece(new Knight(!playColor), 0, 6);
-    setPiece(new Knight(playColor), 7, 1);
-    setPiece(new Knight(playColor), 7, 6);
+    setPiece(new Knight(!playerColor), 0, 1);
+    setPiece(new Knight(!playerColor), 0, 6);
+    setPiece(new Knight(playerColor), 7, 1);
+    setPiece(new Knight(playerColor), 7, 6);
 
-    setPiece(new Bishop(!playColor), 0, 2);
-    setPiece(new Bishop(!playColor), 0, 5);
-    setPiece(new Bishop(playColor), 7, 2);
-    setPiece(new Bishop(playColor), 7, 5);
+    setPiece(new Bishop(!playerColor), 0, 2);
+    setPiece(new Bishop(!playerColor), 0, 5);
+    setPiece(new Bishop(playerColor), 7, 2);
+    setPiece(new Bishop(playerColor), 7, 5);
 
-    setPiece(new Queen(!playColor), 0, 3);
-    setPiece(new Queen(playColor), 7, 3);
+    setPiece(new Queen(!playerColor), 0, 3);
+    setPiece(new Queen(playerColor), 7, 3);
 
-    setPiece(new King(!playColor, this), 0, 4);
-    setPiece(new King(playColor, this), 7, 4);
+    setPiece(new King(!playerColor, this), 0, 4);
+    setPiece(new King(playerColor, this), 7, 4);
 }
 
 void ChessBoard::setPiece(ChessPiece *piece, int row, int col, bool en)
@@ -209,8 +209,7 @@ void ChessBoard::onSquareClicked(int row, int col)
                                                                            lastMoveStart,
                                                                            lastMoveEnd);
                 for (const QPoint &move : moves) {
-                    squares[move.x()][move.y()]->setStyleSheet(pieces[row][col]->isWhitePiece()
-                                                               == currentMoveColor
+                    squares[move.x()][move.y()]->setStyleSheet(pieces[row][col]->isWhitePiece() == playerColor
                                                                    ? possibleMoveSquareColorOn
                                                                    : possibleMoveSquareColorNotOn);
                     highlightedSquares.append(move);
@@ -232,8 +231,7 @@ void ChessBoard::onSquareClicked(int row, int col)
                                                                    lastMoveEnd);
 
         for (const QPoint &move : moves) {
-            squares[move.x()][move.y()]->setStyleSheet(pieces[row][col]->isWhitePiece()
-                                                       == currentMoveColor
+            squares[move.x()][move.y()]->setStyleSheet(pieces[row][col]->isWhitePiece() == playerColor
                                                            ? possibleMoveSquareColorOn
                                                            : possibleMoveSquareColorNotOn);
             highlightedSquares.append(move);
@@ -256,14 +254,14 @@ void ChessBoard::resetSquareColor(int row, int col)
     // If playColor is true (white player's perspective), row+col even means white square
     if ((row + col) % 2 == 0) {
         // If playColor is true, then the bottom-left square (7,0) should be white.
-        if (playColor) {
+        if (playerColor) {
             squares[row][col]->setStyleSheet(whiteSquareColor);
         } else {
             squares[row][col]->setStyleSheet(blackSquareColor);
         }
     } else {
         // If playColor is true, then the bottom-left square (7,0) should be black.
-        if (playColor) {
+        if (playerColor) {
             squares[row][col]->setStyleSheet(blackSquareColor);
         } else {
             squares[row][col]->setStyleSheet(whiteSquareColor);
@@ -911,9 +909,9 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
 
 void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
-    // if (pieceType == "Q") setPiece(new Queen(currentMoveColor), startRow, startCol, 1);
-    // else if (pieceType == "R") setPiece(new Rook(currentMoveColor), startRow, startCol, 1);
-    // else if (pieceType == "N") setPiece(new Knight(currentMoveColor), startRow, startCol, 1);
-    // else if (pieceType == "B") setPiece(new Bishop(currentMoveColor), startRow, startCol, 1);
-    // movePiece(startRow, startCol, endRow, endCol);
+    if (pieceType == "Q") setPiece(new Queen(currentMoveColor), startRow, startCol, 1);
+    else if (pieceType == "R") setPiece(new Rook(currentMoveColor), startRow, startCol, 1);
+    else if (pieceType == "N") setPiece(new Knight(currentMoveColor), startRow, startCol, 1);
+    else if (pieceType == "B") setPiece(new Bishop(currentMoveColor), startRow, startCol, 1);
+    movePiece(startRow, startCol, endRow, endCol);
 }
