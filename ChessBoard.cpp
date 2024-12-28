@@ -624,7 +624,7 @@ bool ChessBoard::isMoveValid(int startRow, int startCol, int endRow, int endCol)
                               lastMoveEnd);
 }
 
-void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
+void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, int en)
 {
     if (!isGaming) return;
     if (currentMoveColor != playerColor) return;
@@ -648,7 +648,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol)
 
     setPiece(piece, endRow, endCol);
     // 处理升变
-    handlePromotion(endRow, endCol, piece);
+    if (!en) handlePromotion(endRow, endCol, piece);
     // 成功完成移动后交换动子方
     switchMove(startRow, startCol, endRow, endCol, piece);
 
@@ -740,7 +740,7 @@ bool ChessBoard::handleCastling(int startRow, int startCol, int endRow, int endC
         return true;
     }
 
-    int baseRow = playerColor == isWhitePiece() ? 7 : 0;
+    int baseRow = playerColor == piece->isWhitePiece() ? 7 : 0;
     if (isKingAttacked())
         return false;
 
@@ -764,8 +764,6 @@ bool ChessBoard::handleCastling(int startRow, int startCol, int endRow, int endC
 bool ChessBoard::handleEnPassant(
     int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
-    qDebug() << "lastMoveInfo (" << lastMoveStart.x() << ',' << lastMoveStart.y() << ") - > ("
-             << lastMoveEnd.x() << ',' << lastMoveEnd.y() << ")";
     if (piece->getType() == "P" && pieces[endRow][endCol] == nullptr
         && lastMovedPiece && lastMovedPiece->getType() == "P"
         && abs(lastMoveEnd.x() - lastMoveStart.x()) == 2 && lastMoveEnd.y() == endCol
@@ -933,8 +931,6 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
         piece = new Pawn(!playerColor, playerColor);
     }
 
+    movePiece(7-startRow, startCol, 7-endRow, endCol, true);
     setPiece(piece, 7-endRow, endCol, true);
-    handleEnPassant(7-startRow, startCol, 7-endRow, endCol, piece);
-    switchMove(7-startRow, startCol, 7-endRow, endCol, piece, true);
-    checkForCheckmateOrDraw(); // 检查是否和棋或被将杀
 }

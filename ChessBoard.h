@@ -70,7 +70,7 @@ private:
     void onSquareClicked(int row, int col);
 
     bool isMoveValid(int startRow, int startCol, int endRow, int endCol);
-    void movePiece(int startRow, int startCol, int endRow, int endCol);
+    void movePiece(int startRow, int startCol, int endRow, int endCol, int en = false);
     void switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece, bool en = false);
     void animatePieceMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece);
 
