@@ -173,9 +173,9 @@ void ChessBoard::initializePieces()
 
 void ChessBoard::setPiece(ChessPiece *piece, int row, int col, bool en)
 {
-    if (pieces[row][col] != nullptr && en == 0) {
+    if (pieces[row][col] != nullptr) {
         // 更新上一次吃子距离数
-        if (pieces[row][col]->isWhitePiece() != piece->isWhitePiece())
+        if (!en && pieces[row][col]->isWhitePiece() != piece->isWhitePiece())
             eatOnePieceDistance = 0;
         delete pieces[row][col];
     }
@@ -695,14 +695,13 @@ void ChessBoard::animatePieceMove(
 
 void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
-    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
-
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
     lastMoveEnd = QPoint(endRow, endCol);
     lastMovedPiece = piece;
 
     // 更新棋盘
+    if (pieces[startRow][startCol]) delete pieces[startRow][startCol];
     pieces[startRow][startCol] = nullptr;
     squares[startRow][startCol]->setIcon(QIcon());
 
@@ -714,6 +713,8 @@ void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, 
     piece->setMoved();
 
     ++eatOnePieceDistance;
+
+    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
 }
 
 bool ChessBoard::tryMovePiece(int startRow, int startCol, int endRow, int endCol)
