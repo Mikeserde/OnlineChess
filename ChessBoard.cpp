@@ -627,10 +627,10 @@ bool ChessBoard::isMoveValid(int startRow, int startCol, int endRow, int endCol)
 void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, int en)
 {
     if (!isGaming) return;
-    if (currentMoveColor != playerColor) return;
+    if (!en && currentMoveColor != playerColor) return;
 
     ChessPiece *piece = pieces[startRow][startCol];
-    if(piece->isWhitePiece() != playerColor) return;
+    if(!en && piece->isWhitePiece() != playerColor) return;
 
     qDebug() << "It's" << (currentMoveColor ? "White'" : "Black'") << "turn!";
 
@@ -651,6 +651,7 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, i
     if (!en) handlePromotion(endRow, endCol, piece);
     // 成功完成移动后交换动子方
     switchMove(startRow, startCol, endRow, endCol, piece);
+
     recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
     // 检查是否和棋或被将杀
     checkForCheckmateOrDraw();
@@ -904,7 +905,6 @@ void ChessBoard::recordMoveHistory(ChessPiece *piece, QPair<QPoint, QPoint> move
 void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endCol, QString pieceType)
 {
     ChessPiece * piece = nullptr;
-    delete pieces[7-startRow][startCol];
     if (pieceType == "Q")
     {
         piece = new Queen(!playerColor);
