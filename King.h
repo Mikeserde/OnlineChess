@@ -110,6 +110,40 @@ public:
         return moves;
     }
 
+    QVector<QPoint> getPossibleAttackSquares(int row, int col, ChessPiece *pieces[8][8])
+    {
+        QVector<QPoint> possibleAttackSquares;
+
+        // 定义国王的移动方向：上下左右及四个对角线
+        QVector<QPoint> directions = {
+            QPoint(-1, 0),
+            QPoint(1, 0), // 上下
+            QPoint(0, -1),
+            QPoint(0, 1), // 左右
+            QPoint(-1, -1),
+            QPoint(-1, 1), // 左上、右上
+            QPoint(1, -1),
+            QPoint(1, 1) // 左下、右下
+        };
+
+        // 遍历每个方向，检查是否可以移动
+        for (const QPoint &dir : directions) {
+            int newRow = row + dir.x();
+            int newCol = col + dir.y();
+
+            // 确保新位置在棋盘范围内
+            if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                ChessPiece *targetPiece = pieces[newRow][newCol];
+
+                // 如果目标位置是空的，或者有敌方棋子，国王可以移动到该位置
+                if (targetPiece == nullptr || targetPiece->isWhitePiece() != this->isWhitePiece()) {
+                    possibleAttackSquares.append(QPoint(newRow, newCol));
+                }
+            }
+        }
+
+        return possibleAttackSquares;
+    }
 };
 
 #endif // KING_H
