@@ -31,13 +31,17 @@ private:
 
     void sendMessage(const QByteArray &message);
 
+    void startGame();
+    void selectedWidgets();
     void placeWidgets();
-    void clientCreated();
     void serverCreated();
+    void clientCreated(const QString &host);
 
     ChessBoard *chessBoard;
     StatusPanel *statusPanel;
     ChatPanel *chatPanel;
+    QComboBox *modeSelector;
+    QLineEdit *ipInput;
     NetworkServer *server;
     NetworkClient *client;
 };

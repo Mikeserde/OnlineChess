@@ -6,26 +6,22 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QMessageBox>
+#include <QApplication>
+#include <QScreen>
+#include <QRegularExpression>
 #include "chatpanel.h"
 #include "chessboard.h"
 #include "NetworkServer.h"
 #include "statuspanel.h"
 #include "NetworkClient.h"
 
-
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), server(nullptr), client(nullptr)
 {
-    playerColor = true;
-    // playerColor = false;
-    server = nullptr;
-    client = nullptr;
-
-    placeWidgets();
-    chessBoard->initial(playerColor);
-    serverCreated();
-    // clientCreated();
+    selectedWidgets();
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -38,7 +34,81 @@ MainWindow::~MainWindow()
     }
 }
 
+void MainWindow::selectedWidgets()
+{
+    // 创建一个中央窗口部件
+    QWidget *centralWidget = new QWidget(this);
+    this->setCentralWidget(centralWidget);
+
+    // 设置窗口大小
+    this->setFixedSize(200, 100);
+
+    // 创建垂直布局
+    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+
+    // 创建一个下拉列表来选择server或者client
+    modeSelector = new QComboBox(this);
+    modeSelector->addItem("Server");
+    modeSelector->addItem("Client");
+    layout->addWidget(modeSelector);
+
+    // 创建一个文本输入框用于输入IP地址
+    ipInput = new QLineEdit(this);
+    ipInput->setPlaceholderText("Enter IP Address");
+    layout->addWidget(ipInput);
+
+    // 创建一个确认按钮
+    QPushButton *confirmButton = new QPushButton("Confirm", this);
+    layout->addWidget(confirmButton);
+
+    // 可以在这里添加信号槽连接以处理确认按钮的点击事件
+    // 例如:
+    // connect(confirmButton, &QPushButton::clicked, this, &MainWindow::onConfirmClicked);
+
+    // 为了更好地布局，我们可以添加一些伸缩空间
+    layout->addStretch(1);
+
+    // 设置中央部件的布局
+    centralWidget->setLayout(layout);
+
+    connect(confirmButton, &QPushButton::clicked, this, &MainWindow::startGame);
+};
+
+void MainWindow::startGame()
+{
+    if (modeSelector->currentText() == "Server")
+    {
+        playerColor = true;
+        placeWidgets();
+        serverCreated();
+    }
+    else if (modeSelector->currentText() == "Client")
+    {
+        QString ipAddress = ipInput->text();
+        // 使用正则表达式验证IP地址格式
+        QRegularExpression ipRegex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+        QRegularExpressionMatch match = ipRegex.match(ipAddress);
+        if (match.hasMatch())
+        {
+            playerColor = false;
+            placeWidgets();
+            clientCreated(ipAddress);
+        }
+        else
+        {
+            QMessageBox::warning(this, "Warning", "Please enter a valid IPv4 address to connect as a Client.");
+        }
+    }
+    else
+    {
+        QMessageBox::warning(this, "Warning", "Please select either Server or Client mode.");
+    }
+}
+
 void MainWindow::placeWidgets() {
+    delete modeSelector;
+    delete ipInput;
+
     // Create a central widget
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
@@ -86,6 +156,15 @@ void MainWindow::placeWidgets() {
     setFixedSize(newWidth * 1.2, newHeight);
 
     setWindowIcon(QIcon(":/images/chess_icon.jpg"));
+    chessBoard->initial(playerColor);
+
+    // 将窗口居中
+    if (QGuiApplication::primaryScreen()) {
+        QRect screenGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+        int x = (screenGeometry.width() - width()) / 2;
+        int y = (screenGeometry.height() - height()) / 2;
+        move(x, y);
+    }
 }
 
 void MainWindow::serverCreated() {
@@ -104,9 +183,9 @@ void MainWindow::serverCreated() {
     connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }
 
-void MainWindow::clientCreated() {
+void MainWindow::clientCreated(const QString &host) {
     // Create the NetworkClient
-    const QString &host = "172.16.20.118";
+    // const QString &host = "172.16.20.118";
     // const QString &host = "172.16.21.13";
     // const QString &host = "127.0.0.1";
 
