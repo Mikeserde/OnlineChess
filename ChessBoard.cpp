@@ -655,10 +655,9 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, i
         handlePromotion(endRow, endCol, piece);
         // 成功完成移动后交换动子方
         switchMove(startRow, startCol, endRow, endCol, piece);
+        // 检查是否和棋或被将杀
+        checkForCheckmateOrDraw();
     }
-
-    // 检查是否和棋或被将杀
-    checkForCheckmateOrDraw();
 }
 
 void ChessBoard::animatePieceMove(
@@ -701,7 +700,6 @@ void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, 
     lastMovedPiece = piece;
 
     // 更新棋盘
-    if (pieces[startRow][startCol]) delete pieces[startRow][startCol];
     pieces[startRow][startCol] = nullptr;
     squares[startRow][startCol]->setIcon(QIcon());
 
@@ -934,4 +932,5 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
     movePiece(7-startRow, startCol, 7-endRow, endCol, true);
     setPiece(piece, 7-endRow, endCol, true);
     switchMove(7-startRow, startCol, 7-endRow, endCol, piece);
+    checkForCheckmateOrDraw();
 }
