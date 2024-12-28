@@ -764,15 +764,16 @@ bool ChessBoard::handleCastling(int startRow, int startCol, int endRow, int endC
 bool ChessBoard::handleEnPassant(
     int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
+    qDebug() << "lastMoveInfo (" << lastMoveStart.x() << ',' << lastMoveStart.y() << ") - > ("
+             << lastMoveEnd.x() << ',' << lastMoveEnd.y() << ")";
     if (piece->getType() == "P" && pieces[endRow][endCol] == nullptr
         && lastMovedPiece && lastMovedPiece->getType() == "P"
         && abs(lastMoveEnd.x() - lastMoveStart.x()) == 2 && lastMoveEnd.y() == endCol
         && startRow == lastMoveEnd.x() && abs(lastMoveEnd.y() - startCol) == 1) {
         qDebug() << "En Passant!";
-        ChessPiece *deletePawn = pieces[lastMoveEnd.x()][lastMoveEnd.y()];
+        delete pieces[lastMoveEnd.x()][lastMoveEnd.y()];
         pieces[lastMoveEnd.x()][lastMoveEnd.y()] = nullptr;
         squares[lastMoveEnd.x()][lastMoveEnd.y()]->setIcon(QIcon());
-        delete deletePawn;
 
         eatOnePieceDistance = 0;
         return true;
@@ -782,12 +783,8 @@ bool ChessBoard::handleEnPassant(
 
 void ChessBoard::handlePromotion(int endRow, int endCol, ChessPiece *&piece)
 {
-    qDebug() << "piece promotion begin";
-
     qDebug() << piece->getType();
     if (piece->getType() == "P" && (endRow == 0 || endRow == 7)) {
-
-        qDebug() << "this is pawn promotion begin";
         PromotionDialog promotionDialog(this, piece->isWhitePiece());
 
         // 获取棋盘格的全局坐标位置
@@ -806,8 +803,6 @@ void ChessBoard::handlePromotion(int endRow, int endCol, ChessPiece *&piece)
             piece = promotionDialog.getSelectedPiece();
             setPiece(piece, endRow, endCol); // 确保棋盘设置了新棋子
         }
-
-        qDebug() << "piece promotion end";
     }
 }
 
