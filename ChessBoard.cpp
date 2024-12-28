@@ -940,4 +940,5 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
     setPiece(piece, 7-endRow, endCol, true);
     handleEnPassant(7-startRow, startCol, 7-endRow, endCol, piece);
     switchMove(7-startRow, startCol, 7-endRow, endCol, piece, true);
+    checkForCheckmateOrDraw(); // 检查是否和棋或被将杀
 }
