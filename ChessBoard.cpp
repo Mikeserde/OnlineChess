@@ -647,12 +647,16 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, i
     handleEnPassant(startRow, startCol, endRow, endCol, piece);
 
     setPiece(piece, endRow, endCol);
-    // 处理升变
-    if (!en) handlePromotion(endRow, endCol, piece);
-    // 成功完成移动后交换动子方
-    switchMove(startRow, startCol, endRow, endCol, piece);
 
-    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
+    if (!en)
+    {
+        // 处理升变
+        emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
+        handlePromotion(endRow, endCol, piece);
+        // 成功完成移动后交换动子方
+        switchMove(startRow, startCol, endRow, endCol, piece);
+    }
+
     // 检查是否和棋或被将杀
     checkForCheckmateOrDraw();
 }
@@ -689,13 +693,9 @@ void ChessBoard::animatePieceMove(
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece, bool en)
+void ChessBoard::switchMove(int startRow, int startCol, int endRow, int endCol, ChessPiece *piece)
 {
-    // 向对方发送移动信息
-    if (!en)
-    {
-        emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
-    }
+    recordMoveHistory(piece, QPair<QPoint, QPoint>(QPoint(startRow, startCol), QPoint(endRow, endCol)));
 
     // 记录移动信息
     lastMoveStart = QPoint(startRow, startCol);
@@ -932,4 +932,5 @@ void ChessBoard::moveByOpponent(int startRow, int startCol, int endRow, int endC
 
     movePiece(7-startRow, startCol, 7-endRow, endCol, true);
     setPiece(piece, 7-endRow, endCol, true);
+    switchMove(7-startRow, startCol, 7-endRow, endCol, piece);
 }
