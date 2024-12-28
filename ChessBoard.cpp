@@ -651,10 +651,10 @@ void ChessBoard::movePiece(int startRow, int startCol, int endRow, int endCol, i
     if (!en)
     {
         // 处理升变
-        emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
         handlePromotion(endRow, endCol, piece);
         // 成功完成移动后交换动子方
         switchMove(startRow, startCol, endRow, endCol, piece);
+        emit moveMessageSent(startRow, startCol, endRow, endCol, piece->getType());
         // 检查是否和棋或被将杀
         checkForCheckmateOrDraw();
     }
