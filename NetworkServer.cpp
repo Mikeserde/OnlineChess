@@ -190,7 +190,7 @@ void NetworkServer::sendMoveMessageToClient(int startRow, int startCol, int endR
 {
     // Format: [MOVE]startRow,startCol,endRow,endCol
     QString moveMessage = QString("%1,%2,%3,%4,%5").arg(startRow).arg(startCol).arg(endRow).arg(endCol).arg(pieceType);
-    sendMessageToClient(moveMessage.toUtf8(), 1);
+    sendMessageToClient(moveMessage.toUtf8(), true);
 }
 
 

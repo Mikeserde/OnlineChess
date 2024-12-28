@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     chessBoard->initial(playerColor);
     serverCreated();
     // clientCreated();
-    connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }
 
 MainWindow::~MainWindow()
@@ -101,6 +100,8 @@ void MainWindow::serverCreated() {
     connect(server, &NetworkServer::clientMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
     connect(server, &NetworkServer::clientReadyInfoReceived, statusPanel, &StatusPanel::enableStartButton);
     connect(statusPanel, &StatusPanel::setClientClcok, server, &NetworkServer::sendClockInfoToClient);
+
+    connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }
 
 void MainWindow::clientCreated() {
@@ -115,6 +116,8 @@ void MainWindow::clientCreated() {
     connect(client, &NetworkClient::serverMoveReceived, chessBoard, &ChessBoard::moveByOpponent);
     connect(client, &NetworkClient::startGameAndSetClock, statusPanel, &StatusPanel::synClockAndStartGame);
     connect(statusPanel, &StatusPanel::sentReadyInfoToServer, client, &NetworkClient::sentReadyInfoToServer);
+
+    connect(chatPanel, &ChatPanel::messageSent, this, &MainWindow::onSendMessageClicked);
 }
 
 void MainWindow::onConnected(const QString &ipAddress, quint16 port)
