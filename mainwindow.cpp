@@ -16,15 +16,15 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    // playerColor = true;
-    playerColor = false;
+    playerColor = true;
+    // playerColor = false;
     server = nullptr;
     client = nullptr;
 
     placeWidgets();
     chessBoard->initial(playerColor);
     serverCreated();
-    clientCreated();
+    // clientCreated();
 }
 
 MainWindow::~MainWindow()
@@ -106,8 +106,8 @@ void MainWindow::serverCreated() {
 
 void MainWindow::clientCreated() {
     // Create the NetworkClient
-    // const QString &host = "172.16.20.118";
-    const QString &host = "172.16.21.13";
+    const QString &host = "172.16.20.118";
+    // const QString &host = "172.16.21.13";
     // const QString &host = "127.0.0.1";
 
     client = new NetworkClient(host, 5010, this);

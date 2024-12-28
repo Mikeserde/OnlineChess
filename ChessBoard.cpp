@@ -740,7 +740,7 @@ bool ChessBoard::handleCastling(int startRow, int startCol, int endRow, int endC
         return true;
     }
 
-    int baseRow = piece->isWhitePiece() ? 7 : 0;
+    int baseRow = playerColor == isWhitePiece() ? 7 : 0;
     if (isKingAttacked())
         return false;
 
@@ -769,7 +769,8 @@ bool ChessBoard::handleEnPassant(
     if (piece->getType() == "P" && pieces[endRow][endCol] == nullptr
         && lastMovedPiece && lastMovedPiece->getType() == "P"
         && abs(lastMoveEnd.x() - lastMoveStart.x()) == 2 && lastMoveEnd.y() == endCol
-        && startRow == lastMoveEnd.x() && abs(lastMoveEnd.y() - startCol) == 1) {
+        && startRow == lastMoveEnd.x() && abs(lastMoveEnd.y() - startCol) == 1)
+    {
         qDebug() << "En Passant!";
         delete pieces[lastMoveEnd.x()][lastMoveEnd.y()];
         pieces[lastMoveEnd.x()][lastMoveEnd.y()] = nullptr;
